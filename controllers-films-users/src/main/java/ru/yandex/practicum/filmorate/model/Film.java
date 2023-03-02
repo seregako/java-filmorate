@@ -1,0 +1,94 @@
+package ru.yandex.practicum.filmorate.model;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+
+import javax.validation.constraints.*;
+import java.time.LocalDate;
+import java.util.Objects;
+
+public class Film {
+    int id;
+    @NotBlank()
+    String name;
+    @Size(max = 200)
+    String description;
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate releaseDate;
+    @Positive
+    int duration;
+    @AssertTrue
+    private boolean dateValidator;
+
+
+    public Film(String name, String description, LocalDate releaseDate, int duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.dateValidator = releaseDate.isAfter(LocalDate.of(1895, 12, 28));
+    }
+
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    @Override
+    public String toString() {
+        return "Film{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", releaseDate=" + releaseDate +
+                ", duration=" + duration +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Film film = (Film) o;
+        return getId() == film.getId() && getDuration() == film.getDuration() && dateValidator == film.dateValidator &&
+                Objects.equals(getName(), film.getName()) && Objects.equals(getDescription(), film.getDescription()) &&
+                Objects.equals(getReleaseDate(), film.getReleaseDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getDescription(), getReleaseDate(), getDuration(), dateValidator);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}
