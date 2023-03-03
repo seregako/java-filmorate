@@ -59,7 +59,6 @@ public class UserControllerTest {
 
     }
 
-
     @Test
     void addValidUserTest() throws Exception {
         User validUser = new User("seregako@mail.ru","a1","a",LocalDate.of(1987,3,4));
