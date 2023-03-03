@@ -23,7 +23,7 @@ public class Film {
     @Positive
     int duration;
     @AssertTrue
-    private boolean dateValidator;
+    private boolean dateValidator;//Валидатор даты релиза
 
 
     public Film(String name, String description, LocalDate releaseDate, int duration) {

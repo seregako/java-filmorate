@@ -38,7 +38,6 @@ public class UserControllerTest {
             .findAndAddModules()
             .build();
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    HttpClient client = HttpClient.newHttpClient();
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -60,9 +59,9 @@ public class UserControllerTest {
 
     }
 
-    @SneakyThrows
+
     @Test
-    void addValidUserTest() {
+    void addValidUserTest() throws Exception {
         User validUser = new User("seregako@mail.ru","a1","a",LocalDate.of(1987,3,4));
         String validUserString =  mapper.writeValueAsString(validUser);
         mockMvc.perform(post("/users")
@@ -118,7 +117,6 @@ assertEquals(Arrays.asList(validUser), controller.getAllUsers());
         mockMvc.perform(put("/users")
                 .contentType("application/json")
                 .content(validUser1String));
-
         log.info("Test usersStore Map: "+store.getAllUsers());
         assertEquals(validUser1, store.getUser(1));
     }
