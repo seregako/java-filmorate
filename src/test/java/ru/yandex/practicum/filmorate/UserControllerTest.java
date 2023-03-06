@@ -112,12 +112,12 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersStore Map: "+store.getAllUsers());
+        log.info("Test usersStore Map: "+store.giveAllUsers());
         mockMvc.perform(put("/users")
                 .contentType("application/json")
                 .content(validUser1String));
-        log.info("Test usersStore Map: "+store.getAllUsers());
-        assertEquals(validUser1, store.getUser(1));
+        log.info("Test usersStore Map: "+store.giveAllUsers());
+        assertEquals(validUser1, store.giveUser(1));
     }
 
 }

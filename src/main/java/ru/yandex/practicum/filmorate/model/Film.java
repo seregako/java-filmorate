@@ -14,20 +14,24 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class Film {
-    int id;
+    private int id;
+
     @NotBlank()
-    String name;
+    private String name;
+
     @Size(max = 200)
-    String description;
+    private String description;
+
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
+
     @Positive
-    int duration;
+    private int duration;
+
     @AssertTrue
     private boolean dateValidator;//Валидатор даты релиза
-
 
     public Film(String name, String description, LocalDate releaseDate, int duration) {
         this.name = name;

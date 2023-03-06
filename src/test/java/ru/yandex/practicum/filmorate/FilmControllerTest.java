@@ -55,7 +55,7 @@ public class FilmControllerTest {
 
     @AfterEach
     public void clear() {
-        controller.getStore().deletAllFilms();
+        controller.getStore().clearFilmsStorage();
         controller.setId(0);
 
     }

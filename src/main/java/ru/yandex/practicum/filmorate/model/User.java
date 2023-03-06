@@ -8,18 +8,20 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class User {
-    int id;
+    private int id;
     @Email
-    String email;
-    @NotBlank
-    String login;
-    @AssertTrue(message = "логин не должен содержать пробелов")
-    boolean loginValid;
+    private String email;
 
-    String name;
+    @NotBlank
+    private String login;
+
+    @AssertTrue(message = "логин не должен содержать пробелов")
+    private boolean loginValid;
+
+    private String name;
 
     @Past
-    LocalDate birthday;
+    private LocalDate birthday;
 
     public User(String email, String login, String name, LocalDate birthday) {
         this.email = email;
