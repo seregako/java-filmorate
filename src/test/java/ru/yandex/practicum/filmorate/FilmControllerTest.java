@@ -19,6 +19,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.strorage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,13 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {FilmorateApplication.class})
 @WebAppConfiguration
 public class FilmControllerTest {
-
-
     ObjectMapper mapper = JsonMapper.builder()
             .findAndAddModules()
             .build();
@@ -43,9 +45,15 @@ public class FilmControllerTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
+
     @Autowired
     FilmController controller;
 
+    @Autowired
+    InMemoryFilmStorage storage;
+
+    @Autowired
+    FilmService service;
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -55,8 +63,8 @@ public class FilmControllerTest {
 
     @AfterEach
     public void clear() {
-        controller.getStore().clearFilmsStorage();
-        controller.setId(0);
+        storage.clearFilmsStorage();
+        storage.setId(0);
 
     }
 
@@ -179,5 +187,31 @@ public class FilmControllerTest {
         IllegalArgumentException ex = Assertions.assertThrows(
                 IllegalArgumentException.class, () -> controller.putFilm(inValidFilm));
         assertEquals("There is no film with id " + inValidFilm.getId(), ex.getMessage());
+    }
+
+    @SneakyThrows
+    @Test
+    void addLikeTest() {
+        Film validFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4), 90);
+        String postedFilmString = mapper.writeValueAsString(validFilm);
+        mockMvc.perform(post("/films")
+                .contentType("application/json")
+                .content(postedFilmString));
+        Film validFilm1 = new Film("A1", "a11", LocalDate.of(1987, 3, 4), 90);
+        String putedFilmString1 = mapper.writeValueAsString(validFilm1);
+        mockMvc.perform(post("/films")
+                .contentType("application/json")
+                .content(putedFilmString1));
+        assertEquals(2, storage.getPopularFilms().size());
+        User validUser = new User("seregako@mail.ru", "a1", "a", LocalDate.of(1987, 3, 4));
+        String validUserString = mapper.writeValueAsString(validUser);
+        mockMvc.perform(post("/users")
+                .contentType("application/json")
+                .content(validUserString));
+        validUser.setId(1);
+        mockMvc.perform(put("/films/1/like/1").contentType("application/json"));
+        assertEquals(storage.giveFilm(1).getRate(), 1);
+        mockMvc.perform(delete("/films/1/like/1").contentType("application/json"));
+        assertEquals(storage.giveFilm(1).getRate(), 0);
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,21 +20,22 @@ import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.store.UserStore;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.strorage.InMemoryUserStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { FilmorateApplication.class })
 @WebAppConfiguration
 public class UserControllerTest {
-
     ObjectMapper mapper = JsonMapper.builder()
             .findAndAddModules()
             .build();
@@ -41,21 +43,26 @@ public class UserControllerTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
+
     @Autowired
-    UserController controller;
-    @Autowired
-    UserStore store;
+     UserController controller;
+
+     @Autowired
+     InMemoryUserStorage store;
+
+     @Autowired
+     UserService service;
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
     }
 
     @AfterEach
     public void clear(){
-        controller.getStore().deletAllUsers();
-        controller.setId(0);
+        store.deletAllUsers();
+        store.setId(0);
 
     }
 
@@ -67,7 +74,7 @@ public class UserControllerTest {
                 .contentType("application/json")
                 .content(validUserString));
         validUser.setId(1);
-        log.info("users Map: "+controller.getAllUsers());
+        log.info("users Map: {} "+controller.getAllUsers());
         assertEquals(Arrays.asList(validUser), controller.getAllUsers());
     }
 
@@ -81,7 +88,7 @@ public class UserControllerTest {
                 .contentType("application/json")
                 .content(inValidUserString));
         inValidEmailUser.setId(1);
-        log.info("users Map: "+controller.getAllUsers());
+        log.info("users Map: {} "+controller.getAllUsers());
         assertTrue(controller.getAllUsers().isEmpty());
     }
 
@@ -96,8 +103,8 @@ public class UserControllerTest {
                 .content(inValidUserString));
         emptyNameUser.setId(1);
         assertTrue(!controller.getAllUsers().isEmpty());
-        log.info("users Map: "+controller.getAllUsers());
-        assertEquals(controller.getUser(1).getName(),controller.getUser(1).getLogin());
+        log.info("users Map: {} "+controller.getAllUsers());
+        assertEquals(store.giveUser(1).getName(),store.giveUser(1).getLogin());
         //пустое имя заплонилось логином
     }
 
@@ -112,12 +119,114 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersStore Map: "+store.giveAllUsers());
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
         mockMvc.perform(put("/users")
                 .contentType("application/json")
                 .content(validUser1String));
-        log.info("Test usersStore Map: "+store.giveAllUsers());
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
         assertEquals(validUser1, store.giveUser(1));
     }
-
+    @SneakyThrows
+    @Test
+    void addFriendTest() {
+        User validUser = new User("seregako@mail.ru","1","a",LocalDate.of(1987,3,4));
+        String validUserString =  mapper.writeValueAsString(validUser);
+        User validUser1 = new User("seregako@mail.ru","2","b",LocalDate.of(1987,3,4));
+        String validUser1String =  mapper.writeValueAsString(validUser1);
+        User validUser2 = new User("seregako@mail.ru","3","c",LocalDate.of(1987,3,4));
+        String validUser2String = mapper.writeValueAsString(validUser2);
+        mockMvc.perform(post("/users")
+                .contentType("application/json")
+                .content(validUserString));
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
+        mockMvc.perform(post("/users")
+                .contentType("application/json")
+                .content(validUser1String));
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
+        mockMvc.perform(post("/users")
+                .contentType("application/json")
+                .content(validUser2String));
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
+        mockMvc.perform(put("/users/1/friends/2")
+                .contentType("application/json")
+                .content(validUserString));
+        log.info("Test usersStore Map after friendAdd: {} "+store.giveAllUsers());
+        mockMvc.perform(put("/users/2/friends/3")
+                .contentType("application/json")
+                .content(validUserString));
+        log.info("Test usersStore Map after friendAdd: {} "+store.giveAllUsers());
+        List<Integer> friends = new ArrayList<>();
+        friends.add(1);
+        friends.add(3);
+        Assertions.assertEquals(store.giveUser(2).getFriends().toString(),friends.toString());
+    }
+    @SneakyThrows
+    @Test
+    void deleteFriendTest() {
+        User validUser = new User("seregako@mail.ru","1","a",LocalDate.of(1987,3,4));
+        String validUserString =  mapper.writeValueAsString(validUser);
+        User validUser1 = new User("seregako@mail.ru","2","b",LocalDate.of(1987,3,4));
+        String validUser1String =  mapper.writeValueAsString(validUser1);
+        User validUser2 = new User("seregako@mail.ru","3","c",LocalDate.of(1987,3,4));
+        String validUser2String = mapper.writeValueAsString(validUser2);
+        mockMvc.perform(post("/users")
+                .contentType("application/json")
+                .content(validUserString));
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
+        mockMvc.perform(post("/users")
+                .contentType("application/json")
+                .content(validUser1String));
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
+        mockMvc.perform(post("/users")
+                .contentType("application/json")
+                .content(validUser2String));
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
+        mockMvc.perform(put("/users/1/friends/2")
+                .contentType("application/json")
+                .content(validUserString));
+        log.info("Test usersStore Map after friendAdd: {} "+store.giveAllUsers());
+        mockMvc.perform(delete("/users/2/friends/1")
+                .contentType("application/json")
+                .content(validUserString));
+        log.info("Test usersStore Map after deleteFriend: {} "+store.giveAllUsers());
+        List<Integer> friends = new ArrayList<>();
+        Assertions.assertEquals(store.giveUser(2).getFriends().toString(),friends.toString());
+    }
+    @SneakyThrows
+    @Test
+    void getCommonFriendsTest() {
+        User validUser = new User("seregako@mail.ru","1","a",LocalDate.of(1987,3,4));
+        String validUserString =  mapper.writeValueAsString(validUser);
+        User validUser1 = new User("seregako@mail.ru","2","b",LocalDate.of(1987,3,4));
+        String validUser1String =  mapper.writeValueAsString(validUser1);
+        User validUser2 = new User("seregako@mail.ru","3","c",LocalDate.of(1987,3,4));
+        String validUser2String = mapper.writeValueAsString(validUser2);
+        mockMvc.perform(post("/users")
+                .contentType("application/json")
+                .content(validUserString));
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
+        mockMvc.perform(post("/users")
+                .contentType("application/json")
+                .content(validUser1String));
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
+        mockMvc.perform(post("/users")
+                .contentType("application/json")
+                .content(validUser2String));
+        log.info("Test usersStore Map: {} "+store.giveAllUsers());
+        mockMvc.perform(put("/users/1/friends/2")
+                .contentType("application/json")
+                .content(validUserString));
+        log.info("Test usersStore Map after friendAdd: {} "+store.giveAllUsers());
+        mockMvc.perform(put("/users/2/friends/3")
+                .contentType("application/json")
+                .content(validUserString));
+        log.info("Test usersStore Map after deleteFriend: {} "+store.giveAllUsers());
+        mockMvc.perform(put("/users/1/friends/3")
+                .contentType("application/json")
+                .content(validUserString));
+        log.info("Test usersStore Map after deleteFriend: {} "+store.giveAllUsers());
+        List<User> commonFriends = new ArrayList<>();
+        commonFriends.add(store.giveUser(3));
+        Assertions.assertEquals(service.giveCommonFriends(1,2),commonFriends);
+    }
 }
