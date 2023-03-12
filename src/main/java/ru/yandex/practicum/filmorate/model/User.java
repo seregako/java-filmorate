@@ -5,9 +5,10 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
-import java.util.Objects;
+import java.util.*;
 
 public class User {
+    private Set<Integer> friends = new HashSet<>();
     private int id;
     @Email
     private String email;
@@ -29,6 +30,14 @@ public class User {
         this.name = name;
         this.birthday = birthday;
         loginValid = !login.contains(" ");
+    }
+
+    public Set<Integer> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(Set<Integer> friends) {
+        this.friends = friends;
     }
 
     public int getId() {
@@ -74,7 +83,8 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "friends=" + friends.toString() +
+                ", id=" + id +
                 ", email='" + email + '\'' +
                 ", login='" + login + '\'' +
                 ", name='" + name + '\'' +
@@ -94,6 +104,6 @@ public class User {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getEmail(), getLogin(), loginValid, getName(), getBirthday());
+        return Objects.hash(getFriends(), getId(), getEmail(), getLogin(), loginValid, getName(), getBirthday());
     }
 }

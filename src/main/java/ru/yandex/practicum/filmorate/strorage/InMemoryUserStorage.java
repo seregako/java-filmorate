@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.store;
+package ru.yandex.practicum.filmorate.strorage;
 
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
@@ -9,14 +9,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
-public class UserStore {
+public class InMemoryUserStorage implements UserStorage {
     private Map<Integer, User> users = new HashMap<>();
 
+    private int id;
+
     public void addUser(User user) {
+        id++;
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        users.put(user.getId(), user);
+        user.setId(id);
+        users.put(id, user);
     }
 
     public void deletAllUsers() {
@@ -24,7 +28,10 @@ public class UserStore {
     }
 
     public User giveUser(int userId) {
-        return users.get(userId);
+        if (users.containsKey(userId)) {
+            return users.get(userId);
+        }
+        else throw new IllegalArgumentException("there is no user with id "+userId);
     }
 
     public List<User> giveAllUsers() {
@@ -32,9 +39,19 @@ public class UserStore {
     }
 
     public void updateUser(User user) {
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
         if (users.containsKey(user.getId())){
-        addUser(user);}
-        else throw new IllegalArgumentException("There is no user with id " + user.getId());
+        users.put(user.getId(), user);
+        }
     }
 
+    public Map<Integer, User> getUsers() {
+        return users;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
