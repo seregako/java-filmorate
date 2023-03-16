@@ -1,18 +1,26 @@
 package ru.yandex.practicum.filmorate.strorage;
 
 import ru.yandex.practicum.filmorate.model.Film;
+
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface FilmStorage {
 
-  void updateFilm(Film film);
+    void update(Film film);
 
-    void clearFilmsStorage();
+    void clearStorage();
 
-    Film giveFilm(int filmId);
+    List<Film> findAll();
 
-    List< Film> giveAllFilms();
+    void add(Film film);
 
-    void addFilm(Film film);
+    Map<Integer, Film> getFilms();
 
+    public Set<Film> findPopular();
+
+    void setId(int id);
+
+    boolean exist(int filmId);
 }

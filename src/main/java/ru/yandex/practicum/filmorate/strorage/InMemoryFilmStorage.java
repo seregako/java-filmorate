@@ -14,7 +14,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private Set<Film> popularFilms = new TreeSet<>(Comparator.comparing(Film::getRate).thenComparing(Film::getId)
             .reversed());
 
-    public void updateFilm(Film film) {
+    public void update(Film film) {
         if (films.containsKey(film.getId())) {
             Film removedFilm = films.get(film.getId());
             popularFilms.remove(removedFilm);
@@ -24,26 +24,26 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
 
-    public Set<Film> getPopularFilms() {
+    public Set<Film> findPopular() {
         return popularFilms;
     }
 
-    public void clearFilmsStorage() {
+    public void clearStorage() {
         films.clear();
     }
 
-    public Film giveFilm(int filmId) {
-        return films.get(filmId);
+    public Optional<Film> find(int filmId) {
+        return Optional.ofNullable(films.get(filmId));
     }
 
-    public List<Film> giveAllFilms() {
+    public List<Film> findAll() {
         return films.entrySet()
                 .stream()
                 .map(e -> e.getValue())
                 .collect(Collectors.toList());
     }
 
-    public void addFilm(Film film) {
+    public void add(Film film) {
         id++;
         film.setId(id);
         films.put(film.getId(), film);
@@ -56,5 +56,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public Map<Integer, Film> getFilms() {
         return films;
+    }
+
+    public boolean exist (int filmId){
+        return films.containsKey(filmId);
     }
 }

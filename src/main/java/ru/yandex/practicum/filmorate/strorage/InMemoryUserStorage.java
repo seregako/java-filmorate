@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -14,7 +15,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     private int id;
 
-    public void addUser(User user) {
+    public void add(User user) {
         id++;
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
@@ -23,27 +24,24 @@ public class InMemoryUserStorage implements UserStorage {
         users.put(id, user);
     }
 
-    public void deletAllUsers() {
+    public void deleteAll() {
         users.clear();
     }
 
-    public User giveUser(int userId) {
-        if (users.containsKey(userId)) {
-            return users.get(userId);
-        }
-        else throw new IllegalArgumentException("there is no user with id "+userId);
+    public Optional<User> findById(int userId) {
+        return Optional.ofNullable(users.get(userId));
     }
 
-    public List<User> giveAllUsers() {
+    public List<User> findAll() {
         return users.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
-    public void updateUser(User user) {
+    public void update(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        if (users.containsKey(user.getId())){
-        users.put(user.getId(), user);
+        if (users.containsKey(user.getId())) {
+            users.put(user.getId(), user);
         }
     }
 
@@ -53,5 +51,9 @@ public class InMemoryUserStorage implements UserStorage {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean exist (int userId){
+        return users.containsKey(userId);
     }
 }
