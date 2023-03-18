@@ -74,7 +74,7 @@ public class UserControllerTest {
                 .contentType("application/json")
                 .content(validUserString));
         validUser.setId(1);
-        log.info("users Map: {} " + controller.getAllUsers());
+        log.info("users Map: {} ", controller.getAllUsers());
         assertEquals(Arrays.asList(validUser), controller.getAllUsers());
     }
 
@@ -88,7 +88,7 @@ public class UserControllerTest {
                 .contentType("application/json")
                 .content(inValidUserString));
         inValidEmailUser.setId(1);
-        log.info("users Map: {} " + controller.getAllUsers());
+        log.info("users Map: {} ", controller.getAllUsers());
         assertTrue(controller.getAllUsers().isEmpty());
     }
 
@@ -103,7 +103,7 @@ public class UserControllerTest {
                 .content(inValidUserString));
         emptyNameUser.setId(1);
         assertTrue(!controller.getAllUsers().isEmpty());
-        log.info("users Map: {} " + controller.getAllUsers());
+        log.info("users Map: {} ", controller.getAllUsers());
         assertEquals(userService.getById(1).getName(), userService.getById(1).getLogin());
         //пустое имя заплонилось логином
     }
@@ -119,11 +119,11 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(put("/users")
                 .contentType("application/json")
                 .content(validUser1String));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         assertEquals(validUser1, userService.getById(1));
     }
 
@@ -139,23 +139,23 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUser1String));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUser2String));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(put("/users/1/friends/2")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map after friendAdd: {} " + userService.getAll());
+        log.info("Test usersuserService Map after friendAdd: {} ", userService.getAll());
         mockMvc.perform(put("/users/2/friends/3")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map after friendAdd: {} " + userService.getAll());
+        log.info("Test usersuserService Map after friendAdd: {} ", userService.getAll());
         List<Integer> friends = new ArrayList<>();
         friends.add(1);
         friends.add(3);
@@ -174,23 +174,23 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUser1String));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUser2String));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(put("/users/1/friends/2")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map after friendAdd: {} " + userService.getAll());
+        log.info("Test usersuserService Map after friendAdd: {} ", userService.getAll());
         mockMvc.perform(delete("/users/2/friends/1")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map after deleteFriend: {} " + userService.getAll());
+        log.info("Test usersuserService Map after deleteFriend: {} ", userService.getAll());
         List<Integer> friends = new ArrayList<>();
         Assertions.assertEquals(userService.getById(2).getFriends().toString(), friends.toString());
     }
@@ -207,27 +207,27 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUser1String));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUser2String));
-        log.info("Test usersuserService Map: {} " + userService.getAll());
+        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(put("/users/1/friends/2")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map after friendAdd: {} " + userService.getAll());
+        log.info("Test usersuserService Map after friendAdd: {} ", userService.getAll());
         mockMvc.perform(put("/users/2/friends/3")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map after deleteFriend: {} " + userService.getAll());
+        log.info("Test usersuserService Map after deleteFriend: {} ", userService.getAll());
         mockMvc.perform(put("/users/1/friends/3")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map after deleteFriend: {} " + userService.getAll());
+        log.info("Test usersuserService Map after deleteFriend: {} ", userService.getAll());
         List<User> commonFriends = new ArrayList<>();
         commonFriends.add(userService.getById(3));
         Assertions.assertEquals(userService.getCommonFriends(1, 2), commonFriends);

@@ -16,9 +16,7 @@ public interface FilmStorage {
 
     void add(Film film);
 
-    Map<Integer, Film> getFilms();
-
-    public Set<Film> findPopular();
+    Set<Film> findPopular();
 
     void setId(int id);
 

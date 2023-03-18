@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exceptions.NoFilmIdException;
+import ru.yandex.practicum.filmorate.exceptions.NoIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -80,7 +80,7 @@ public class FilmControllerTest {
                 .contentType("application/json")
                 .content(validFilmString));
         validFilm.setId(1);
-        log.info("films Map: " + controller.getAllFilms());
+        log.info("films Map: ", controller.getAllFilms());
         List<Film> oneFilmList = new ArrayList<>();
         oneFilmList.add(validFilm);
         assertEquals(oneFilmList, controller.getAllFilms());
@@ -95,7 +95,7 @@ public class FilmControllerTest {
                 .contentType("application/json")
                 .content(validFilmString));
         invalidFilm.setId(1);
-        log.info("films Map: " + controller.getAllFilms());
+        log.info("films Map: ", controller.getAllFilms());
         assertTrue(controller.getAllFilms().isEmpty());
     }
 
@@ -117,7 +117,7 @@ public class FilmControllerTest {
                 .contentType("application/json")
                 .content(invalidFilmString));
         invalidFilm.setId(1);
-        log.info("films Map: " + controller.getAllFilms());
+        log.info("films Map: ", controller.getAllFilms());
         assertTrue(controller.getAllFilms().isEmpty());
     }
 
@@ -130,7 +130,7 @@ public class FilmControllerTest {
                 .contentType("application/json")
                 .content(invalidFilmString));
         invalidFilm.setId(1);
-        log.info("films Map: " + controller.getAllFilms());
+        log.info("films Map: ", controller.getAllFilms());
         assertTrue(controller.getAllFilms().isEmpty());
     }
 
@@ -143,7 +143,7 @@ public class FilmControllerTest {
                 .contentType("application/json")
                 .content(invalidFilmString));
         invalidFilm.setId(1);
-        log.info("films Map: " + controller.getAllFilms());
+        log.info("films Map: ", controller.getAllFilms());
         assertTrue(controller.getAllFilms().isEmpty());
     }
 
@@ -161,7 +161,7 @@ public class FilmControllerTest {
         mockMvc.perform(put("/films")
                 .contentType("application/json")
                 .content(putedFilmString1));
-        log.info("films Map: " + controller.getAllFilms());
+        log.info("films Map: ", controller.getAllFilms());
         List<Film> oneFilmList = new ArrayList<>();
         oneFilmList.add(validFilm1);
         assertEquals(oneFilmList, controller.getAllFilms());
@@ -178,7 +178,7 @@ public class FilmControllerTest {
                     .contentType("application/json")
                     .content(putedFilmString1)).andExpect(mvcResult -> mvcResult.getResolvedException().getClass().
                     equals(IllegalArgumentException.class));
-            log.info("films Map: " + controller.getAllFilms());
+            log.info("films Map: ", controller.getAllFilms());
         } finally {
             return;
         }
@@ -187,8 +187,8 @@ public class FilmControllerTest {
     @Test
     public void ThrowException() {//тестирование исключения без mockMvc
         Film inValidFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4), 90);
-        NoFilmIdException ex = Assertions.assertThrows(
-                NoFilmIdException.class, () -> controller.putFilm(inValidFilm));
+        NoIdException ex = Assertions.assertThrows(
+                NoIdException.class, () -> controller.putFilm(inValidFilm));
         assertEquals("Wrong film Id", ex.getMessage());
     }
 

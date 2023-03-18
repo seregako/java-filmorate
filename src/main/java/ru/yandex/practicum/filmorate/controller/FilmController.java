@@ -35,27 +35,27 @@ public class FilmController {
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         service.post(film);
-        log.info("storage now: {} " + service.getAll() + "\n List of popularity" + service.getPopular(10));
+        log.info("storage now: {} " , service.getAll() + "\n List of popularity", service.getPopular(10));
         return film;
     }
 
     @PutMapping
     public Film putFilm(@Valid @RequestBody Film film) {
         service.put(film);
-        log.info("storage now: {} " + service.getAll() + "\n List of popularity" + service.getPopular(10));
+        log.info("storage now: {} " , service.getAll() + "\n List of popularity", service.getPopular(10));
         return film;
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("id") int filmId, @PathVariable int userId) {
         service.addLike(filmId, userId);
-        log.info("storage after like: {} " + service.getAll() + "\n List of popularity" + service.getPopular(10));
+        log.info("storage after like: {} ", service.getAll() + "\n List of popularity", service.getPopular(10));
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable("id") int filmId, @PathVariable int userId) {
             service.removeLike(filmId, userId);
-            log.info("storage after dislike: {} " + service.getAll() + "\n List of popularity" + service.getPopular(10));
+            log.info("storage after dislike: {} ", service.getAll() + "\n List of popularity", service.getPopular(10));
     }
 
     @GetMapping("/popular")

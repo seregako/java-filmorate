@@ -14,16 +14,9 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseError handleNoUserIdException(NoUserIdException exception) {
+    public ResponseError handleNoIdException(NoIdException exception) {
         log.error(exception.getMessage(), exception);
         return new ResponseError(exception.getMessage(), HttpStatus.PAYMENT_REQUIRED);
     }
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseError handleNoFilmIdException(NoFilmIdException exception) {
-        log.error(exception.getMessage(), exception);
-        return new ResponseError(exception.getMessage(), HttpStatus.PAYMENT_REQUIRED);
-    }
-
 
 }

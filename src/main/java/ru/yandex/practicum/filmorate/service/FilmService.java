@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NoFilmIdException;
-import ru.yandex.practicum.filmorate.exceptions.NoUserIdException;
+import ru.yandex.practicum.filmorate.exceptions.NoIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.strorage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.strorage.InMemoryUserStorage;
@@ -22,23 +21,21 @@ public class FilmService {
     }
 
     public Film getById(int filmId) {
-        return filmStorage.find(filmId).orElseThrow(() -> new NoFilmIdException("Wrong film Id"));
+        return filmStorage.find(filmId).orElseThrow(() -> new NoIdException("Wrong film Id"));
     }
 
     public void addLike(int filmId, int userId) {
-        if (userStorage.exist(userId)) {
-            Film film = filmStorage.find(filmId).orElseThrow(() -> new NoFilmIdException("Wrong film Id"));
+        if (!userStorage.exist(userId)) { throw new NoIdException("No user with id " + userId);}
+            Film film = filmStorage.find(filmId).orElseThrow(() -> new NoIdException("Wrong film Id"));
             film.getLikes().add(userId);
             filmStorage.update(film);
-        } else throw new NoUserIdException("No user with id " + userId);
     }
 
     public void removeLike(int filmId, int userId) {
-        if (userStorage.exist(userId)) {
-            Film film = filmStorage.find(filmId).orElseThrow(() -> new NoFilmIdException("Wrong film Id"));
+        if (!userStorage.exist(userId)) {throw new NoIdException("No user with id " + userId);}
+            Film film = filmStorage.find(filmId).orElseThrow(() -> new NoIdException("Wrong film Id"));
             film.getLikes().remove(userId);
             filmStorage.update(film);
-        } else throw new NoUserIdException("No user with id " + userId);
     }
 
     public List<Film> getPopular(int count) {
@@ -61,9 +58,8 @@ public class FilmService {
     }
 
     public void put(Film film) {
-        if (filmStorage.exist(film.getId())) {
+        if (!filmStorage.exist(film.getId())) {throw new NoIdException("Wrong film Id");}
             filmStorage.update(film);
-        } else throw new NoFilmIdException("Wrong film Id");
     }
 
     public List<Film> getAll() {

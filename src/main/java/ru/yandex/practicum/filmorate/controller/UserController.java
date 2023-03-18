@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NoUserIdException;
+import ru.yandex.practicum.filmorate.exceptions.NoIdException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -35,27 +35,27 @@ public class UserController {
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
         userService.post(user);
-        log.info("Map after POST: {}" + userService.getAll());
+        log.info("Map after POST: {}", userService.getAll());
         return user;
     }
 
     @PutMapping()
-    public User putUser(@RequestBody User user) throws NoUserIdException {
+    public User putUser(@RequestBody User user) throws NoIdException {
         userService.put(user);
-        log.info("Map after PUT: {}" + userService.getAll());
+        log.info("Map after PUT: {}", userService.getAll());
         return user;
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable("id") int userId, @PathVariable int friendId) {
         userService.addFriend(userId, friendId);
-        log.info("Map after add friend: {}" + userService.getAll());
+        log.info("Map after add friend: {}", userService.getAll());
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable("id") int userId, @PathVariable int friendId) {
         userService.removeFromFriends(userId, friendId);
-        log.info("Map after delete friend: {}" + userService.getAll());
+        log.info("Map after delete friend: {}", userService.getAll());
     }
 
 

@@ -15,12 +15,11 @@ public class InMemoryFilmStorage implements FilmStorage {
             .reversed());
 
     public void update(Film film) {
-        if (films.containsKey(film.getId())) {
+        if (!films.containsKey(film.getId())) {throw new IllegalArgumentException("There is no film with id " + film.getId());}
             Film removedFilm = films.get(film.getId());
             popularFilms.remove(removedFilm);
             popularFilms.add(film);
             films.put(film.getId(), film);
-        } else throw new IllegalArgumentException("There is no film with id " + film.getId());
     }
 
 
@@ -52,10 +51,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public Map<Integer, Film> getFilms() {
-        return films;
     }
 
     public boolean exist (int filmId){
