@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.*;
 import javax.validation.Valid;
@@ -27,35 +29,35 @@ public class FilmController {
         return service.getAll();
     }
 
-    @GetMapping(value = "/{id}")
+   @GetMapping(value = "/{id}")
     public Film getFilm(@PathVariable("id") int filmId) {
         return service.getById(filmId);
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        service.post(film);
-        log.info("storage now: {} " , service.getAll() + "\n List of popularity", service.getPopular(10));
+       film = service.post(film);
+        log.info("storage now: {} " , service.getAll());
         return film;
     }
 
     @PutMapping
     public Film putFilm(@Valid @RequestBody Film film) {
-        service.put(film);
-        log.info("storage now: {} " , service.getAll() + "\n List of popularity", service.getPopular(10));
+       film = service.put(film);
+        //log.info("storage now: {} " , service.getAll() + "\n List of popularity", service.getPopular(10));
         return film;
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("id") int filmId, @PathVariable int userId) {
         service.addLike(filmId, userId);
-        log.info("storage after like: {} ", service.getAll() + "\n List of popularity", service.getPopular(10));
+       // log.info("storage after like: {} ", service.getAll() + "\n List of popularity", service.getPopular(10));
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable("id") int filmId, @PathVariable int userId) {
             service.removeLike(filmId, userId);
-            log.info("storage after dislike: {} ", service.getAll() + "\n List of popularity", service.getPopular(10));
+            //log.info("storage after dislike: {} ", service.getAll() + "\n List of popularity", service.getPopular(10));
     }
 
     @GetMapping("/popular")
@@ -65,4 +67,5 @@ public class FilmController {
         }
         return service.getPopular(count);
     }
+
 }

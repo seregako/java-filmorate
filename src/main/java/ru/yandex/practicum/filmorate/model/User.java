@@ -16,8 +16,8 @@ public class User {
     @NotBlank
     private String login;
 
-    @AssertTrue(message = "логин не должен содержать пробелов")
-    private boolean loginValid;
+   /* @AssertTrue(message = "логин не должен содержать пробелов")
+    private boolean loginValid;*/
 
     private String name;
 
@@ -29,8 +29,10 @@ public class User {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
-        loginValid = !login.contains(" ");
+        //loginValid = !login.contains(" ");
     }
+
+    public User (){};
 
     public Set<Integer> getFriends() {
         return friends;
@@ -83,8 +85,8 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "friends=" + friends.toString() +
-                ", id=" + id +
+                //"friends=" + friends.toString() +
+                " id=" + id +
                 ", email='" + email + '\'' +
                 ", login='" + login + '\'' +
                 ", name='" + name + '\'' +
@@ -97,13 +99,13 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return getId() == user.getId() && loginValid == user.loginValid && Objects.equals(getEmail(), user.getEmail())
+        return getId() == user.getId()  && Objects.equals(getEmail(), user.getEmail())
                 && Objects.equals(getLogin(), user.getLogin()) && Objects.equals(getName(), user.getName())
                 && Objects.equals(getBirthday(), user.getBirthday());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFriends(), getId(), getEmail(), getLogin(), loginValid, getName(), getBirthday());
+        return Objects.hash(getFriends(), getId(), getEmail(), getLogin(), getName(), getBirthday());
     }
 }

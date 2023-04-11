@@ -34,16 +34,16 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        userService.post(user);
+       User userFromstorage = userService.post(user);
         log.info("Map after POST: {}", userService.getAll());
-        return user;
+        return userFromstorage;
     }
 
     @PutMapping()
     public User putUser(@RequestBody User user) throws NoIdException {
-        userService.put(user);
+        User userFromstorage =  userService.put(user);
         log.info("Map after PUT: {}", userService.getAll());
-        return user;
+        return userFromstorage;
     }
 
     @PutMapping("/{id}/friends/{friendId}")
