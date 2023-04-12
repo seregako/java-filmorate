@@ -171,7 +171,7 @@ public class FilmControllerTest {
 
     @SneakyThrows
     @Test
-    void putToVoidIdFilmTest() {//Попробовал сделать тест на исключене через mockMvc, сам не понял, получилось или нет
+    void putToVoidIdFilmTest(){
         Film inValidFilm = new Film("A1", "a11", LocalDate.of(1987, 3, 4),
                 90, new Mpa(1), new TreeSet<Genre>());
         inValidFilm.setId(1);
@@ -182,8 +182,7 @@ public class FilmControllerTest {
             log.info("films Map: ", controller.getAllFilms());
         } finally {
             return;
-        }
-    }
+        }}
 
     @Test
     public void throwException() {//тестирование исключения без mockMvc
