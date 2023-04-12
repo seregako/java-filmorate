@@ -23,7 +23,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.strorage.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,10 +56,10 @@ public class FilmControllerTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void setup()  {
+    public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
         service.clearStorage();
-        log.info("Список фильмлов перед тестом: "+service.getAll());
+        log.info("Список фильмлов перед тестом: " + service.getAll());
     }
 
     @AfterEach
@@ -113,7 +112,7 @@ public class FilmControllerTest {
                 .toString();
 
         Film invalidFilm = new Film("A", generatedString, LocalDate.of(1987, 3, 4),
-                90,new Mpa(1), new TreeSet<Genre>());
+                90, new Mpa(1), new TreeSet<Genre>());
         String invalidFilmString = mapper.writeValueAsString(invalidFilm);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
@@ -127,7 +126,7 @@ public class FilmControllerTest {
     @Test
     void addWrongReleaseDateFilmTest() {
         Film invalidFilm = new Film("A", "a", LocalDate.of(1895, 12, 27),
-                90,new Mpa(1), new TreeSet<Genre>());
+                90, new Mpa(1), new TreeSet<Genre>());
         String invalidFilmString = mapper.writeValueAsString(invalidFilm);
         IllegalArgumentException ex = Assertions.assertThrows(
                 IllegalArgumentException.class, () -> controller.putFilm(invalidFilm));
@@ -138,7 +137,7 @@ public class FilmControllerTest {
     @Test
     void addNegativeDurationFilmTest() {
         Film invalidFilm = new Film("A", "a", LocalDate.of(1895, 12, 29),
-                -90,new Mpa(1), new TreeSet<Genre>());
+                -90, new Mpa(1), new TreeSet<Genre>());
         String invalidFilmString = mapper.writeValueAsString(invalidFilm);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
@@ -152,13 +151,13 @@ public class FilmControllerTest {
     @Test
     void putFilmTest() {
         Film validFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4),
-                90,new Mpa(1), new TreeSet<Genre>());
+                90, new Mpa(1), new TreeSet<Genre>());
         String postedFilmString = mapper.writeValueAsString(validFilm);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
                 .content(postedFilmString));
         Film validFilm1 = new Film("A1", "a11", LocalDate.of(1987, 3, 4),
-                90,new Mpa(1), new TreeSet<Genre>());
+                90, new Mpa(1), new TreeSet<Genre>());
         validFilm1.setId(2);
         String putedFilmString1 = mapper.writeValueAsString(validFilm1);
         mockMvc.perform(put("/films")
@@ -174,7 +173,7 @@ public class FilmControllerTest {
     @Test
     void putToVoidIdFilmTest() {//Попробовал сделать тест на исключене через mockMvc, сам не понял, получилось или нет
         Film inValidFilm = new Film("A1", "a11", LocalDate.of(1987, 3, 4),
-                90,new Mpa(1), new TreeSet<Genre>());
+                90, new Mpa(1), new TreeSet<Genre>());
         inValidFilm.setId(1);
         String putedFilmString1 = mapper.writeValueAsString(inValidFilm);
         try {
@@ -191,7 +190,7 @@ public class FilmControllerTest {
     @Test
     public void ThrowException() {//тестирование исключения без mockMvc
         Film inValidFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4),
-                90,new Mpa(1), new TreeSet<Genre>());
+                90, new Mpa(1), new TreeSet<Genre>());
         NoIdException ex = Assertions.assertThrows(
                 NoIdException.class, () -> controller.putFilm(inValidFilm));
         assertEquals("Wrong film Id", ex.getMessage());
@@ -201,13 +200,13 @@ public class FilmControllerTest {
     @Test
     void addLikeTest() {
         Film validFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4),
-                90,new Mpa(1), new TreeSet<Genre>());
+                90, new Mpa(1), new TreeSet<Genre>());
         String postedFilmString = mapper.writeValueAsString(validFilm);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
                 .content(postedFilmString));
         Film validFilm1 = new Film("A1", "a11", LocalDate.of(1987, 3, 4),
-                90,new Mpa(1), new TreeSet<Genre>());
+                90, new Mpa(1), new TreeSet<Genre>());
         String putedFilmString1 = mapper.writeValueAsString(validFilm1);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
