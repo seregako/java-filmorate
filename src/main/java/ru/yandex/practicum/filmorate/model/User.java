@@ -27,7 +27,10 @@ public class User {
         this.birthday = birthday;
     }
 
-    public User (){};
+    public User() {
+    }
+
+    ;
 
     public Set<Integer> getFriends() {
         return friends;
@@ -94,7 +97,7 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return getId() == user.getId()  && Objects.equals(getEmail(), user.getEmail())
+        return getId() == user.getId() && Objects.equals(getEmail(), user.getEmail())
                 && Objects.equals(getLogin(), user.getLogin()) && Objects.equals(getName(), user.getName())
                 && Objects.equals(getBirthday(), user.getBirthday());
     }

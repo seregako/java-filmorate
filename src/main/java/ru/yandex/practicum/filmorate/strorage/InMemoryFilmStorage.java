@@ -18,12 +18,14 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 
     public Film update(Film film) {
-        if (!films.containsKey(film.getId())) {throw new IllegalArgumentException("There is no film with id " + film.getId());}
-            Film removedFilm = films.get(film.getId());
-            popularFilms.remove(removedFilm);
-            popularFilms.add(film);
-            films.put(film.getId(), film);
-   return film;
+        if (!films.containsKey(film.getId())) {
+            throw new IllegalArgumentException("There is no film with id " + film.getId());
+        }
+        Film removedFilm = films.get(film.getId());
+        popularFilms.remove(removedFilm);
+        popularFilms.add(film);
+        films.put(film.getId(), film);
+        return film;
     }
 
 
@@ -65,7 +67,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         update(film);
     }
 
-    public boolean exist (int filmId){
+    public boolean exist(int filmId) {
         return films.containsKey(filmId);
     }
 
@@ -82,12 +84,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Mpa MpaById(int mpaId) {
+    public Mpa mpaById(int mpaId) {
         return null;
     }
 
     @Override
-    public Optional <Genre> GenreById(int genreId) {
+    public Optional<Genre> genreById(int genreId) {
         return null;
     }
 

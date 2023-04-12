@@ -56,7 +56,7 @@ public class InMemoryUserStorage implements UserStorage {
         this.id = id;
     }
 
-    public boolean exist (int userId){
+    public boolean exist(int userId) {
         return users.containsKey(userId);
     }
 
@@ -71,7 +71,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List <Friendship> findFriends(int userId) {
-return null;
+    public List<Friendship> findFriends(int userId) {
+        return null;
     }
 }

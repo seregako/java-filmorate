@@ -28,7 +28,7 @@ public class FilmService {
     }
 
     public Mpa getMpaById(int mpaId) {
-        return filmStorage.MpaById(mpaId);
+        return filmStorage.mpaById(mpaId);
     }
 
     public Film post(Film film) {
@@ -81,7 +81,7 @@ public class FilmService {
     }
 
     public Genre getGenreById(int genreId) {
-        return filmStorage.GenreById(genreId).orElseThrow(() -> new NoIdException("Wrong genre Id"));
+        return filmStorage.genreById(genreId).orElseThrow(() -> new NoIdException("Wrong genre Id"));
     }
 
     public List<Genre> getGenreList() {

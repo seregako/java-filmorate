@@ -5,7 +5,8 @@ import java.util.Objects;
 public class Genre {
     int id;
     String name;
-    public Genre (int id){
+
+    public Genre(int id) {
         this.id = id;
         setName1(id);
     }
@@ -13,21 +14,27 @@ public class Genre {
     public Genre() {
     }
 
-    private void setName1(int id){
-        switch (id){
-            case (1): this.name = "Комедия";
-            break;
-            case (2): this.name = "Драма";
-            break;
-            case (3): this.name = "Мультфильм";
-            break;
-            case (4): this.name = "Триллер";
-            break;
-            case (5): this.name = "Документальный";
-            break;
-            case (6): this.name = "Боевик";
-            break;
-            }
+    private void setName1(int id) {
+        switch (id) {
+            case (1):
+                this.name = "Комедия";
+                break;
+            case (2):
+                this.name = "Драма";
+                break;
+            case (3):
+                this.name = "Мультфильм";
+                break;
+            case (4):
+                this.name = "Триллер";
+                break;
+            case (5):
+                this.name = "Документальный";
+                break;
+            case (6):
+                this.name = "Боевик";
+                break;
+        }
     }
 
     public int getId() {

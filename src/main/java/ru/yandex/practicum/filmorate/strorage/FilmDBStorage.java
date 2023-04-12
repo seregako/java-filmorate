@@ -31,7 +31,7 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public Film find(int id) {
-        log.info("актуальное хранилище фильмов: "+findAll());
+        log.info("актуальное хранилище фильмов: " + findAll());
         if (!exist(id)) throw new NoIdException("Wrong film id!");
         String sql = "SELECT *, m.name AS mpa_name FROM film AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id WHERE f.id = ?";
         Film film = jdbcTemplate.query(sql, new Object[]{id}, new FilmMapper()).stream().findAny().get();
@@ -141,14 +141,14 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public Mpa MpaById(int mpaId) {
+    public Mpa mpaById(int mpaId) {
         if (!mpaExist(mpaId)) throw new NoIdException("No MPA with id " + mpaId);
         String sql = "SELECT * FROM mpa WHERE mpa_id = ?";
         return jdbcTemplate.query(sql, new Object[]{mpaId}, new MpaMapper()).stream().findAny().get();
     }
 
     @Override
-    public Optional<Genre> GenreById(int genreId) {
+    public Optional<Genre> genreById(int genreId) {
         if (!genreExist(genreId)) throw new NoIdException("No genre with id " + genreId);
         String sql = "SELECT * FROM genre WHERE genre_id = ?";
         log.info("возврвщаемый жанр " + jdbcTemplate.query(sql, new Object[]{genreId}, new GenreMapper()).stream().findAny());

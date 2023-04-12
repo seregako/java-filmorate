@@ -23,7 +23,7 @@ public interface FilmStorage {
 
     void setId(int id);
 
-    void addLike (int filmId, int userId);
+    void addLike(int filmId, int userId);
 
     boolean exist(int filmId);
 
@@ -31,9 +31,9 @@ public interface FilmStorage {
 
     List<Mpa> allMpa();
 
-    Mpa MpaById(int mpaId);
+    Mpa mpaById(int mpaId);
 
-    Optional <Genre> GenreById(int genreId);
+    Optional<Genre> genreById(int genreId);
 
     List<Genre> allGenres();
 
