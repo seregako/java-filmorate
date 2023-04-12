@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jdk.jshell.Snippet;
-
 import java.util.Objects;
 
 public class Genre {

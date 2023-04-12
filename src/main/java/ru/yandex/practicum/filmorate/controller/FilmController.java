@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.*;
@@ -18,7 +16,7 @@ import javax.validation.Valid;
 
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final int POPULAR_FILMSLIST_DEFAULT_SIZE = 10;
+    private final int popularFilmslistDefaultSize = 10;
     private final FilmService service;
 
     public FilmController(FilmService service) {
@@ -61,7 +59,7 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopulareFilms(@RequestParam(required = false) Integer count) {
         if (count == null) {
-            return service.getPopular(POPULAR_FILMSLIST_DEFAULT_SIZE);
+            return service.getPopular(popularFilmslistDefaultSize);
         }
         return service.getPopular(count);
     }
