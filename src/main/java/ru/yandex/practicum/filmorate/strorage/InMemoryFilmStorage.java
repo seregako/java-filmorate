@@ -36,8 +36,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.clear();
     }
 
-    public Optional<Film> find(int filmId) {
-        return Optional.ofNullable(films.get(filmId));
+    public Film find(int filmId) {
+        return films.get(filmId);
     }
 
     public List<Film> findAll() {
@@ -61,7 +61,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void addLike(int filmId, int userId) {
-        Film film = find(filmId).orElseThrow(() -> new NoIdException("Wrong film Id"));
+        Film film = find(filmId);
         film.getLikes().add(userId);
         update(film);
     }
@@ -72,7 +72,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void removeLike(int filmId, int userId) {
-        Film film = find(filmId).orElseThrow(() -> new NoIdException("Wrong film Id"));
+        Film film = find(filmId);
         film.getLikes().remove(userId);
         update(film);
     }
@@ -88,7 +88,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Genre GenreById(int genreId) {
+    public Optional <Genre> GenreById(int genreId) {
         return null;
     }
 

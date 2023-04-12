@@ -44,7 +44,9 @@ public class FilmService {
     }
 
     public Film getById(int filmId) {
-        return filmStorage.find(filmId).orElseThrow(() -> new NoIdException("Wrong film Id"));
+        Film film = filmStorage.find(filmId);
+        film.setGenres(filmDao.getGenresByFilmId(filmId));
+        return film;
     }
 
     public void addLike(int filmId, int userId) {
@@ -90,7 +92,8 @@ public class FilmService {
 
 
     public Genre getGenreById(int genreId) {
-   return filmStorage.GenreById(genreId);
+
+        return filmStorage.GenreById(genreId).orElseThrow(() -> new NoIdException("Wrong genre Id"));
     }
 
     public List<Genre> getGenreList() {

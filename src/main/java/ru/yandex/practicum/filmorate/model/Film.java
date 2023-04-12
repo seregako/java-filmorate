@@ -36,7 +36,7 @@ public class Film {
     @Positive
     private int duration;
 
-    Set<Genre> genres = new HashSet<>();
+    Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
 
     Mpa mpa;
 

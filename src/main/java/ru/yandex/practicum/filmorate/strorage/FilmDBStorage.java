@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.strorage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -14,19 +16,22 @@ import java.util.Set;
 @Repository
 public class FilmDBStorage implements FilmStorage {
     FilmDao filmDao;
+    private final UserStorage userStorage;
+    private final JdbcTemplate jdbcTemplate;
 
-    public FilmDBStorage(FilmDao filmDao) {
-        this.filmDao = filmDao;
+    public FilmDBStorage(@Qualifier("userDBStorage") UserStorage userStorage, JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.userStorage = userStorage;
     }
 
     @Override
-    public Optional<Film> find(int id) {
+    public Film find(int id) {
         return filmDao.find(id);
     }
 
     @Override
     public Film update(Film film) {
-return filmDao.update(film);
+        return filmDao.update(film);
     }
 
     @Override
@@ -80,7 +85,7 @@ return filmDao.update(film);
     }
 
     @Override
-    public Genre GenreById(int genreId) {
+    public Optional <Genre> GenreById(int genreId) {
         return filmDao.GenreById(genreId);
     }
 

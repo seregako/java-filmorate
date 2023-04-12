@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface FilmStorage {
-    Optional<Film> find(int id);
+    Film find(int id);
 
     Film update(Film film);
 
@@ -34,7 +34,7 @@ public interface FilmStorage {
 
     Mpa MpaById(int mpaId);
 
-    Genre GenreById(int genreId);
+    Optional <Genre> GenreById(int genreId);
 
     List<Genre> allGenres();
 }
