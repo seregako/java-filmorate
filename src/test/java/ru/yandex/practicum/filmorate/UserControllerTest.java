@@ -178,8 +178,7 @@ public class UserControllerTest {
                 .content(validUserString));
         log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
-                .contentType("application/json")
-                .content(validUser1String));
+                .contentType("application/json").content(validUser1String));
         log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
                 .contentType("application/json")

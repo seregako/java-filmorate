@@ -177,10 +177,8 @@ public class FilmControllerTest {
         inValidFilm.setId(1);
         String putedFilmString1 = mapper.writeValueAsString(inValidFilm);
         try {
-            mockMvc.perform(put("/films")
-                    .contentType("application/json")
-                    .content(putedFilmString1)).andExpect(mvcResult -> mvcResult.getResolvedException().getClass().
-                    equals(IllegalArgumentException.class));
+            mockMvc.perform(put("/films").contentType("application/json").content(putedFilmString1))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(IllegalArgumentException.class));
             log.info("films Map: ", controller.getAllFilms());
         } finally {
             return;
@@ -188,11 +186,10 @@ public class FilmControllerTest {
     }
 
     @Test
-    public void ThrowException() {//тестирование исключения без mockMvc
+    public void throwException() {//тестирование исключения без mockMvc
         Film inValidFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4),
                 90, new Mpa(1), new TreeSet<Genre>());
-        NoIdException ex = Assertions.assertThrows(
-                NoIdException.class, () -> controller.putFilm(inValidFilm));
+        NoIdException ex = Assertions.assertThrows(NoIdException.class, () -> controller.putFilm(inValidFilm));
         assertEquals("Wrong film Id", ex.getMessage());
     }
 
