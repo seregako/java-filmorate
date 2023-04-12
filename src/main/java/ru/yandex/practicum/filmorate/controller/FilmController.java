@@ -5,8 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.store.FilmStore;
-
+import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.*;
 import javax.validation.Valid;
 
@@ -16,42 +15,54 @@ import javax.validation.Valid;
 
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final FilmStore store;
-    private int id = 0;
-    public FilmController(FilmStore store) {
-        this.store = store;
+    private final int  POPULAR_FILMSLIST_DEFAULT_SIZE = 10;
+    private final FilmService service;
+
+    public FilmController(FilmService service) {
+        this.service = service;
     }
 
     @GetMapping
     public List<Film> getAllFilms() {
-        return store.giveAllFilms();
+        return service.getAll();
     }
 
     @GetMapping(value = "/{id}")
     public Film getFilm(@PathVariable("id") int filmId) {
-        return store.giveFilm(filmId);
+        return service.getById(filmId);
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        id++;
-        film.setId(id);
-        store.addFilm(film);
-        log.info("storage now: {} " + store.giveAllFilms());
+        service.post(film);
+        log.info("storage now: {} " , service.getAll() + "\n List of popularity", service.getPopular(10));
         return film;
     }
 
     @PutMapping
-    public Film putFilm(@RequestBody Film film) {
-        store.updateFilm(film);
+    public Film putFilm(@Valid @RequestBody Film film) {
+        service.put(film);
+        log.info("storage now: {} " , service.getAll() + "\n List of popularity", service.getPopular(10));
         return film;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable("id") int filmId, @PathVariable int userId) {
+        service.addLike(filmId, userId);
+        log.info("storage after like: {} ", service.getAll() + "\n List of popularity", service.getPopular(10));
     }
 
-    public FilmStore getStore() {
-        return store;
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteLike(@PathVariable("id") int filmId, @PathVariable int userId) {
+            service.removeLike(filmId, userId);
+            log.info("storage after dislike: {} ", service.getAll() + "\n List of popularity", service.getPopular(10));
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopulareFilms(@RequestParam(required = false) Integer count) {
+        if (count == null) {
+            return service.getPopular( POPULAR_FILMSLIST_DEFAULT_SIZE);
+        }
+        return service.getPopular(count);
     }
 }

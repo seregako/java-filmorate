@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -11,9 +12,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class Film {
+    @JsonIgnore
+    Set <Integer> likes = new HashSet();//Сет с уникальными айдишниками лайкнувших
     private int id;
 
     @NotBlank()
@@ -57,6 +62,7 @@ public class Film {
                 ", description='" + description + '\'' +
                 ", releaseDate=" + releaseDate +
                 ", duration=" + duration +
+                ", likes=" + likes +
                 '}';
     }
 
@@ -97,5 +103,16 @@ public class Film {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    public int getRate() {
+        return likes.size();
+    }
+
+    public Set<Integer> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<Integer> likes) {
+        this.likes = likes;
     }
 }
