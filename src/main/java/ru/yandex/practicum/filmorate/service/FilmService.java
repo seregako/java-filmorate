@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.exceptions.NoIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -16,19 +15,15 @@ import java.util.List;
 
 @Service
 public class FilmService {
-
     FilmStorage filmStorage;
     UserStorage userStorage;
-    FilmDao filmDao;
-    //FilmDBStorage filmDBStorage;
 
-    public FilmService(@Qualifier("filmDBStorage") FilmStorage filmStorage, @Qualifier ("userDBStorage")UserStorage userStorage,
-                       FilmDao filmDao) {
+    public FilmService(@Qualifier("filmDBStorage") FilmStorage filmStorage, @Qualifier("userDBStorage") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
-        this.filmDao = filmDao;
     }
-    public List<Mpa> getMpaList(){
+
+    public List<Mpa> getMpaList() {
         return filmStorage.allMpa();
     }
 
@@ -36,28 +31,26 @@ public class FilmService {
         return filmStorage.MpaById(mpaId);
     }
 
-    public Film post(Film film){
-       if (!dateValidator(film)) throw new IllegalArgumentException ("Слишком ранняя дата");
-       else {
-           return filmStorage.add(film);
-       }
+    public Film post(Film film) {
+        if (!dateValidator(film)) throw new IllegalArgumentException("Слишком ранняя дата");
+        else {
+            return filmStorage.add(film);
+        }
     }
 
     public Film getById(int filmId) {
         Film film = filmStorage.find(filmId);
-        film.setGenres(filmDao.getGenresByFilmId(filmId));
+        film.setGenres(filmStorage.getGenresByFilmId(filmId));
         return film;
     }
 
     public void addLike(int filmId, int userId) {
-       // if (!userStorage.exist(userId)) { throw new NoIdException("No user with id " + userId);}
-        filmStorage.addLike (filmId, userId);
+        filmStorage.addLike(filmId, userId);
 
     }
 
     public void removeLike(int filmId, int userId) {
-        //if (!userStorage.exist(userId)) {throw new NoIdException("No user with id " + userId);}
-           filmStorage.removeLike (filmId, userId);
+        filmStorage.removeLike(filmId, userId);
 
     }
 
@@ -76,30 +69,30 @@ public class FilmService {
         return populars;
     }
 
-   /* public void post(Film film) {
-        filmStorage.add(film);
-    }*/
-
     public Film put(Film film) {
-        if (!dateValidator(film)) throw new IllegalArgumentException ("Слишком ранняя дата");
+        if (!dateValidator(film)) throw new IllegalArgumentException("Слишком ранняя дата");
         else {
-         return  filmStorage.update(film);}
+            return filmStorage.update(film);
+        }
     }
 
     public List<Film> getAll() {
-        return filmDao.findAll();
+        return filmStorage.findAll();
     }
 
-
     public Genre getGenreById(int genreId) {
-
         return filmStorage.GenreById(genreId).orElseThrow(() -> new NoIdException("Wrong genre Id"));
     }
 
     public List<Genre> getGenreList() {
         return filmStorage.allGenres();
     }
-    private boolean dateValidator (Film film){
+
+    private boolean dateValidator(Film film) {
         return (film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 28)));
+    }
+
+    public void clearStorage() {
+        filmStorage.clearStorage();
     }
 }

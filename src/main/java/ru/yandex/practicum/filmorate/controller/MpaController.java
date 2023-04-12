@@ -17,16 +17,18 @@ public class MpaController {
     private final FilmService service;
 
     public MpaController(FilmService service) {
-            this.service = service;
-        }
+        this.service = service;
+    }
+
     @GetMapping()
-    public List<Mpa> getMpaList (){
+    public List<Mpa> getMpaList() {
         return service.getMpaList();
     }
-    @GetMapping ("/{id}")
-    public Mpa getMpaById (@PathVariable("id") int mpaId){
+
+    @GetMapping("/{id}")
+    public Mpa getMpaById(@PathVariable("id") int mpaId) {
         return service.getMpaById(mpaId);
     }
-    }
+}
 
 

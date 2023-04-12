@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import lombok.Data;
-import org.springframework.data.relational.core.sql.In;
 
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
@@ -42,28 +39,16 @@ public class Film {
 
     private int rating;
 
-  //  @AssertTrue
-    private boolean dateValidator;//Валидатор даты релиза
-
-    public Film(String name, String description, LocalDate releaseDate, int duration, Mpa mpa, Set <Genre> genres) {
+    public Film(String name, String description, LocalDate releaseDate, int duration, Mpa mpa, Set<Genre> genres) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.dateValidator = releaseDate.isAfter(LocalDate.of(1895, 12, 28));
         this.mpa = mpa;
         this.genres = genres;
     }
 
     public Film() {
-        //this.dateValidator = releaseDate.isAfter(LocalDate.of(1895, 12, 28));
-    }
-    private List <Genre> genresList(List <Integer> genresIds){
-        List <Genre> genresList = new ArrayList<>();
-        for (Integer id: genresIds){
-            genresList.add(new Genre(id));
-        }
-        return genresList;
     }
 
     public LocalDate getReleaseDate() {
@@ -83,7 +68,7 @@ public class Film {
                 ", description='" + description + '\'' +
                 ", releaseDate=" + releaseDate +
                 ", duration=" + duration +
-               ", genres=" + genres +
+                ", genres=" + genres +
                 ", mpa=" + mpa +
                 ", rating=" + rating +
                 '}';
@@ -94,14 +79,14 @@ public class Film {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Film film = (Film) o;
-        return getId() == film.getId() && getDuration() == film.getDuration() && dateValidator == film.dateValidator &&
+        return getId() == film.getId() && getDuration() == film.getDuration() &&
                 Objects.equals(getName(), film.getName()) && Objects.equals(getDescription(), film.getDescription()) &&
                 Objects.equals(getReleaseDate(), film.getReleaseDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getDescription(), getReleaseDate(), getDuration(), dateValidator);
+        return Objects.hash(getId(), getName(), getDescription(), getReleaseDate(), getDuration());
     }
 
     public int getRate() {
@@ -148,13 +133,13 @@ public class Film {
         this.duration = duration;
     }
 
-   public Set<Genre> getGenres() {
+    public Set<Genre> getGenres() {
         return genres;
     }
 
     public void setGenres(Set<Genre> genres) {
-       this.genres = genres;
-  }
+        this.genres = genres;
+    }
 
     public Mpa getMpa() {
         return mpa;
@@ -170,14 +155,6 @@ public class Film {
 
     public void setRating(int rating) {
         this.rating = rating;
-    }
-
-    public boolean isDateValidator() {
-        return dateValidator;
-    }
-
-    public void setDateValidator(boolean dateValidator) {
-        this.dateValidator = dateValidator;
     }
 
 }

@@ -16,9 +16,6 @@ public class User {
     @NotBlank
     private String login;
 
-   /* @AssertTrue(message = "логин не должен содержать пробелов")
-    private boolean loginValid;*/
-
     private String name;
 
     @Past
@@ -29,7 +26,6 @@ public class User {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
-        //loginValid = !login.contains(" ");
     }
 
     public User (){};

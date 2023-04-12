@@ -6,12 +6,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.FilmDao;
-import ru.yandex.practicum.filmorate.dao.FilmMapper;
 import ru.yandex.practicum.filmorate.dao.FriendshipMapper;
 import ru.yandex.practicum.filmorate.dao.UserMapper;
-import ru.yandex.practicum.filmorate.exceptions.NoIdException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -25,7 +21,7 @@ import java.util.Optional;
 @Repository
 public class UserDBStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
-    private static final Logger log = LoggerFactory.getLogger(FilmDao.class);
+    private static final Logger log = LoggerFactory.getLogger(UserDBStorage.class);
 
     public UserDBStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -33,7 +29,8 @@ public class UserDBStorage implements UserStorage {
 
     @Override
     public void deleteAll() {
-
+        String sql = "delete from user_table; delete from friends";
+        jdbcTemplate.execute(sql);
     }
 
     @Override
@@ -43,8 +40,8 @@ public class UserDBStorage implements UserStorage {
     }
 
     public Map<Integer, User> getUsers() {
-        Map <Integer, User> usersMap = new HashMap<>();
-        for (User user: findAll()){
+        Map<Integer, User> usersMap = new HashMap<>();
+        for (User user : findAll()) {
             usersMap.put(user.getId(), user);
         }
         return usersMap;
@@ -76,7 +73,7 @@ public class UserDBStorage implements UserStorage {
     public User update(User user) {
         log.info("Юзер для обновления" + user.toString());
         String sql = "update user_table set name = ?, email = ?, login = ?," +
-                "birthday =? where id = "+ user.getId();
+                "birthday =? where id = " + user.getId();
         jdbcTemplate.update(sql, user.getName(), user.getEmail(),
                 user.getLogin(), user.getBirthday());
         return user;
@@ -84,25 +81,25 @@ public class UserDBStorage implements UserStorage {
 
     @Override
     public boolean exist(int userId) {
-        log.info("Список юзеров"+ getUsers());
+        log.info("Список юзеров" + getUsers());
         return getUsers().containsKey(userId);
     }
 
     @Override
     public void addFriend(int userId, int friendId) {
         String sql = "INSERT INTO friends (user_id, friend_id) VALUES (?,?)";
-        jdbcTemplate.update(sql, userId,friendId);
+        jdbcTemplate.update(sql, userId, friendId);
     }
 
     @Override
     public void removeFriend(int userId, int friendId) {
-        String sql  = "DELETE FROM friends WHERE user_id = ? and friend_id = ?";
-        jdbcTemplate.update(sql, userId,friendId);
+        String sql = "DELETE FROM friends WHERE user_id = ? and friend_id = ?";
+        jdbcTemplate.update(sql, userId, friendId);
     }
 
     @Override
-    public List <Friendship> findFriends(int userId) {
-       String sql = "SELECT * FROM friends WHERE user_id ="+ userId;
+    public List<Friendship> findFriends(int userId) {
+        String sql = "SELECT * FROM friends WHERE user_id =" + userId;
         return jdbcTemplate.query(sql, new FriendshipMapper());
     }
 

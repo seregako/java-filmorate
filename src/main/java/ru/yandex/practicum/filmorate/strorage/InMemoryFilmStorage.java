@@ -96,4 +96,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Genre> allGenres() {
         return null;
     }
+
+    @Override
+    public Set<Genre> getGenresByFilmId(int filmId) {
+        return null;
+    }
 }

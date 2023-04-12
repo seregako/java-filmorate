@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
+
 import java.util.*;
 import javax.validation.Valid;
 
@@ -17,7 +18,7 @@ import javax.validation.Valid;
 
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final int  POPULAR_FILMSLIST_DEFAULT_SIZE = 10;
+    private final int POPULAR_FILMSLIST_DEFAULT_SIZE = 10;
     private final FilmService service;
 
     public FilmController(FilmService service) {
@@ -29,41 +30,38 @@ public class FilmController {
         return service.getAll();
     }
 
-   @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}")
     public Film getFilm(@PathVariable("id") int filmId) {
         return service.getById(filmId);
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-       film = service.post(film);
-        log.info("storage now: {} " , service.getAll());
+        film = service.post(film);
+        log.info("storage now: {} ", service.getAll());
         return film;
     }
 
     @PutMapping
     public Film putFilm(@Valid @RequestBody Film film) {
-       film = service.put(film);
-        //log.info("storage now: {} " , service.getAll() + "\n List of popularity", service.getPopular(10));
+        film = service.put(film);
         return film;
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("id") int filmId, @PathVariable int userId) {
         service.addLike(filmId, userId);
-       // log.info("storage after like: {} ", service.getAll() + "\n List of popularity", service.getPopular(10));
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable("id") int filmId, @PathVariable int userId) {
-            service.removeLike(filmId, userId);
-            //log.info("storage after dislike: {} ", service.getAll() + "\n List of popularity", service.getPopular(10));
+        service.removeLike(filmId, userId);
     }
 
     @GetMapping("/popular")
     public List<Film> getPopulareFilms(@RequestParam(required = false) Integer count) {
         if (count == null) {
-            return service.getPopular( POPULAR_FILMSLIST_DEFAULT_SIZE);
+            return service.getPopular(POPULAR_FILMSLIST_DEFAULT_SIZE);
         }
         return service.getPopular(count);
     }

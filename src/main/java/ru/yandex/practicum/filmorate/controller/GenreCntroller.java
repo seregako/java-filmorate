@@ -21,12 +21,12 @@ public class GenreCntroller {
     }
 
     @GetMapping()
-    public List<Genre> getGenresList (){
+    public List<Genre> getGenresList() {
         return service.getGenreList();
     }
 
-    @GetMapping ("/{id}")
-    public Genre getGenreById (@PathVariable("id") int genreId){
+    @GetMapping("/{id}")
+    public Genre getGenreById(@PathVariable("id") int genreId) {
         return service.getGenreById(genreId);
     }
 }
