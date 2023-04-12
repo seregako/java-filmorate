@@ -171,7 +171,7 @@ public class FilmControllerTest {
 
     @SneakyThrows
     @Test
-    void putToVoidIdFilmTest() {Film inValidFilm = new Film("A1", "a11", LocalDate.of(1987, 3, 4),
+    void putToVoidIdFilmTest(){Film inValidFilm = new Film("A1", "a11", LocalDate.of(1987, 3, 4),
                 90, new Mpa(1), new TreeSet<Genre>());
         inValidFilm.setId(1);
         String putedFilmString1 = mapper.writeValueAsString(inValidFilm);
