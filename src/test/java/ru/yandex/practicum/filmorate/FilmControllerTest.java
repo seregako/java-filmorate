@@ -157,7 +157,7 @@ public class FilmControllerTest {
                 .content(postedFilmString));
         Film validFilm1 = new Film("A1", "a11", LocalDate.of(1987, 3, 4),
                 90, new Mpa(1), new TreeSet<Genre>());
-        validFilm1.setId(2);
+        validFilm1.setId(1);
         String putedFilmString1 = mapper.writeValueAsString(validFilm1);
         mockMvc.perform(put("/films")
                 .contentType("application/json")
@@ -207,16 +207,16 @@ public class FilmControllerTest {
         mockMvc.perform(post("/films")
                 .contentType("application/json")
                 .content(putedFilmString1));
-        assertEquals(2, service.getPopular(2).size());
+        assertEquals(1, service.getPopular(1).size());
         User validUser = new User("seregako@mail.ru", "a1", "a", LocalDate.of(1987, 3, 4));
         String validUserString = mapper.writeValueAsString(validUser);
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUserString));
         validUser.setId(1);
-        mockMvc.perform(put("/films/3/like/1").contentType("application/json"));
-        assertEquals(service.getById(3).getRating(), 1);
-        mockMvc.perform(delete("/films/3/like/1").contentType("application/json"));
-        assertEquals(service.getById(3).getRate(), 0);
+        mockMvc.perform(put("/films/1/like/1").contentType("application/json"));
+        assertEquals(service.getById(1).getRating(), 1);
+        mockMvc.perform(delete("/films/1/like/1").contentType("application/json"));
+        assertEquals(service.getById(1).getRate(), 0);
     }
 }

@@ -57,7 +57,7 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public void clearStorage() {
-        String sql = "delete from film; delete from likes; delete from films_genres";
+        String sql = "delete from film; delete from likes; delete from films_genres; ALTER TABLE film ALTER COLUMN id RESTART WITH 1 ";
         jdbcTemplate.execute(sql);
     }
 
@@ -114,7 +114,7 @@ public class FilmDBStorage implements FilmStorage {
     @Override
     public void addLike(int filmId, int userId) {
         if (!userStorage.exist(userId)) throw new NoIdException("addLike no user with id " + userId);
-        if (!exist(filmId))throw new NoIdException("addLike no film with id " + filmId);
+        if (!exist(filmId))throw new NoIdException("addLike: no film with id " + filmId);
         String sql = "insert into likes (film_id, user_id) values (?,?)";
         jdbcTemplate.update(sql, filmId, userId);
     }

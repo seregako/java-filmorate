@@ -29,8 +29,9 @@ public class UserDBStorage implements UserStorage {
 
     @Override
     public void deleteAll() {
-        String sql = "delete from user_table; delete from friends";
+        String sql = "delete from user_table; delete from friends;ALTER TABLE user_table ALTER COLUMN id RESTART WITH 1 ";
         jdbcTemplate.execute(sql);
+        log.info("хранилище после очистки" + findAll() + actualTableSize());
     }
 
     @Override
@@ -66,12 +67,12 @@ public class UserDBStorage implements UserStorage {
         }, keyHolder);
         int newId = keyHolder.getKey().intValue();
         user.setId(newId);
-        log.info("New User Created: {}", user);
+        log.info("From add User: New User Created: {}", user);
         return user;
     }
 
     public User update(User user) {
-        log.info("Юзер для обновления" + user.toString());
+        log.info("From update user: User for update: {}", user.toString());
         String sql = "update user_table set name = ?, email = ?, login = ?," +
                 "birthday =? where id = " + user.getId();
         jdbcTemplate.update(sql, user.getName(), user.getEmail(),
@@ -101,6 +102,13 @@ public class UserDBStorage implements UserStorage {
     public List<Friendship> findFriends(int userId) {
         String sql = "SELECT * FROM friends WHERE user_id =" + userId;
         return jdbcTemplate.query(sql, new FriendshipMapper());
+    }
+
+    private int actualTableSize() {
+        String sql = "select count (*) from user_table";
+        Integer answer = jdbcTemplate.queryForObject(
+                sql, Integer.class);
+        return answer;
     }
 
 
