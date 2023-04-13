@@ -16,7 +16,7 @@ import javax.validation.Valid;
 
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final int popularFilmslistDefaultSize = 10;
+    public static final int POPULAR_LIST_SIZE = 10;
     private final FilmService service;
 
     public FilmController(FilmService service) {
@@ -34,15 +34,15 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@Valid @RequestBody Film film) {
-        film = service.post(film);
+    public Film post(@Valid @RequestBody Film film) {
+        film = service.create(film);
         log.info("storage now: {} ", service.getAll());
         return film;
     }
 
     @PutMapping
-    public Film putFilm(@Valid @RequestBody Film film) {
-        film = service.put(film);
+    public Film put(@Valid @RequestBody Film film) {
+        film = service.update(film);
         return film;
     }
 
@@ -59,7 +59,7 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopulareFilms(@RequestParam(required = false) Integer count) {
         if (count == null) {
-            return service.getPopular(popularFilmslistDefaultSize);
+            return service.getPopular(POPULAR_LIST_SIZE);
         }
         return service.getPopular(count);
     }

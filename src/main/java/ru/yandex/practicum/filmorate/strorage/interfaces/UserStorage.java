@@ -1,6 +1,5 @@
-package ru.yandex.practicum.filmorate.strorage;
+package ru.yandex.practicum.filmorate.strorage.interfaces;
 
-import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -21,11 +20,4 @@ public interface UserStorage {
     User update(User user);
 
     boolean exist(int userId);
-
-    void addFriend(int userId, int friendId);
-
-    void removeFriend(int userId, int friendId);
-
-    List<Friendship> findFriends(int userId);
-
 }
