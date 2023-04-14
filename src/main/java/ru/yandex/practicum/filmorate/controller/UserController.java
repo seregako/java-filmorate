@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NoIdException;
+import ru.yandex.practicum.filmorate.exceptions.NoFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import javax.validation.Valid;;
+import javax.validation.Valid;
 import java.util.List;
 
 @Validated
@@ -33,17 +33,17 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
-        userService.post(user);
+    public User post(@Valid @RequestBody User user) {
+        User userFromstorage = userService.create(user);
         log.info("Map after POST: {}", userService.getAll());
-        return user;
+        return userFromstorage;
     }
 
     @PutMapping()
-    public User putUser(@RequestBody User user) throws NoIdException {
-        userService.put(user);
+    public User put(@RequestBody User user) throws NoFoundException {
+        User userFromStorage = userService.update(user);
         log.info("Map after PUT: {}", userService.getAll());
-        return user;
+        return userFromStorage;
     }
 
     @PutMapping("/{id}/friends/{friendId}")
@@ -57,7 +57,6 @@ public class UserController {
         userService.removeFromFriends(userId, friendId);
         log.info("Map after delete friend: {}", userService.getAll());
     }
-
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable("id") int userId) {

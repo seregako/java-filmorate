@@ -2,18 +2,17 @@ package ru.yandex.practicum.filmorate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -21,7 +20,8 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.strorage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.strorage.FriendsDBStorage;
+import ru.yandex.practicum.filmorate.strorage.UserDBStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,9 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {FilmorateApplication.class})
-@WebAppConfiguration
+@SpringBootTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserControllerTest {
     ObjectMapper mapper = JsonMapper.builder()
             .findAndAddModules()
@@ -48,10 +48,14 @@ public class UserControllerTest {
     UserController controller;
 
     @Autowired
-    InMemoryUserStorage userStorage;
+    UserDBStorage userStorage;
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    FriendsDBStorage friendsStorage;
+
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -62,8 +66,7 @@ public class UserControllerTest {
     @AfterEach
     public void clear() {
         userStorage.deleteAll();
-        userStorage.setId(0);
-
+        friendsStorage.deleteAll();
     }
 
     @Test
@@ -151,15 +154,20 @@ public class UserControllerTest {
         mockMvc.perform(put("/users/1/friends/2")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map after friendAdd: {} ", userService.getAll());
+        mockMvc.perform(put("/users/2/friends/1")
+                .contentType("application/json")
+                .content(validUserString));
         mockMvc.perform(put("/users/2/friends/3")
+                .contentType("application/json")
+                .content(validUserString));
+        mockMvc.perform(put("/users/3/friends/2")
                 .contentType("application/json")
                 .content(validUserString));
         log.info("Test usersuserService Map after friendAdd: {} ", userService.getAll());
         List<Integer> friends = new ArrayList<>();
         friends.add(1);
         friends.add(3);
-        Assertions.assertEquals(userService.getById(2).getFriends().toString(), friends.toString());
+        Assertions.assertEquals(userService.getCommonFriends(3, 1), userService.getFriendsList(1));
     }
 
     @SneakyThrows
@@ -176,8 +184,7 @@ public class UserControllerTest {
                 .content(validUserString));
         log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
-                .contentType("application/json")
-                .content(validUser1String));
+                .contentType("application/json").content(validUser1String));
         log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
                 .contentType("application/json")
@@ -192,7 +199,7 @@ public class UserControllerTest {
                 .content(validUserString));
         log.info("Test usersuserService Map after deleteFriend: {} ", userService.getAll());
         List<Integer> friends = new ArrayList<>();
-        Assertions.assertEquals(userService.getById(2).getFriends().toString(), friends.toString());
+        Assertions.assertEquals(userService.getFriendsList(2).size(), friends.size());
     }
 
     @SneakyThrows
@@ -207,20 +214,22 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUser1String));
-        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(validUser2String));
-        log.info("Test usersuserService Map: {} ", userService.getAll());
         mockMvc.perform(put("/users/1/friends/2")
                 .contentType("application/json")
                 .content(validUserString));
-        log.info("Test usersuserService Map after friendAdd: {} ", userService.getAll());
+        mockMvc.perform(put("/users/2/friends/1")
+                .contentType("application/json")
+                .content(validUserString));
         mockMvc.perform(put("/users/2/friends/3")
+                .contentType("application/json")
+                .content(validUserString));
+        mockMvc.perform(put("/users/3/friends/2")
                 .contentType("application/json")
                 .content(validUserString));
         log.info("Test usersuserService Map after deleteFriend: {} ", userService.getAll());

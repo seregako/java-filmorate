@@ -2,28 +2,29 @@ package ru.yandex.practicum.filmorate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exceptions.NoIdException;
+import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
+import ru.yandex.practicum.filmorate.exceptions.NoFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.strorage.FilmStorage;
+import ru.yandex.practicum.filmorate.strorage.LikesdBStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,9 +37,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {FilmorateApplication.class})
-@WebAppConfiguration
+@SpringBootTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmControllerTest {
     ObjectMapper mapper = JsonMapper.builder()
             .findAndAddModules()
@@ -52,29 +53,32 @@ public class FilmControllerTest {
     FilmController controller;
 
     @Autowired
-    @Qualifier("inMemoryFilmStorage")
-    FilmStorage storage;
+    FilmService service;
 
     @Autowired
-    FilmService service;
+    LikesdBStorage likesStorage;
+
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+        service.clearStorage();
+        likesStorage.clearStorage();
+        log.info("Список фильмлов перед тестом: " + service.getAll());
     }
 
     @AfterEach
     public void clear() {
-        storage.clearStorage();
-        storage.setId(0);
+        service.clearStorage();
 
     }
 
     @SneakyThrows
     @Test
     void addValidFilmTest() {
-        Film validFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4), 90);
+        Film validFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4), 90,
+                new Mpa(1, "G"), new ArrayList<Genre>());
         String validFilmString = mapper.writeValueAsString(validFilm);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
@@ -89,7 +93,8 @@ public class FilmControllerTest {
     @SneakyThrows
     @Test
     void addBlankNameFilmTest() {
-        Film invalidFilm = new Film(" ", "a1", LocalDate.of(1987, 3, 4), 90);
+        Film invalidFilm = new Film(" ", "a1", LocalDate.of(1987, 3, 4), 90,
+                new Mpa(1, "G"), new ArrayList<Genre>());
         String validFilmString = mapper.writeValueAsString(invalidFilm);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
@@ -111,7 +116,8 @@ public class FilmControllerTest {
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
 
-        Film invalidFilm = new Film("A", generatedString, LocalDate.of(1987, 3, 4), 90);
+        Film invalidFilm = new Film("A", generatedString, LocalDate.of(1987, 3, 4),
+                90, new Mpa(1, "G"), new ArrayList<Genre>());
         String invalidFilmString = mapper.writeValueAsString(invalidFilm);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
@@ -124,20 +130,19 @@ public class FilmControllerTest {
     @SneakyThrows
     @Test
     void addWrongReleaseDateFilmTest() {
-        Film invalidFilm = new Film("A", "a", LocalDate.of(1895, 12, 27), 90);
+        Film invalidFilm = new Film("A", "a", LocalDate.of(1895, 12, 27),
+                90, new Mpa(1, "G"), new ArrayList<Genre>());
         String invalidFilmString = mapper.writeValueAsString(invalidFilm);
-        mockMvc.perform(post("/films")
-                .contentType("application/json")
-                .content(invalidFilmString));
-        invalidFilm.setId(1);
-        log.info("films Map: ", controller.getAllFilms());
-        assertTrue(controller.getAllFilms().isEmpty());
+        BadRequestException ex = Assertions.assertThrows(
+                BadRequestException.class, () -> controller.put(invalidFilm));
+        assertEquals("Слишком ранняя дата", ex.getMessage());
     }
 
     @SneakyThrows
     @Test
     void addNegativeDurationFilmTest() {
-        Film invalidFilm = new Film("A", "a", LocalDate.of(1895, 12, 29), -90);
+        Film invalidFilm = new Film("A", "a", LocalDate.of(1895, 12, 29),
+                -90, new Mpa(1, "G"), new ArrayList<Genre>());
         String invalidFilmString = mapper.writeValueAsString(invalidFilm);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
@@ -150,12 +155,14 @@ public class FilmControllerTest {
     @SneakyThrows
     @Test
     void putFilmTest() {
-        Film validFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4), 90);
+        Film validFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4),
+                90, new Mpa(1, "G"), new ArrayList<Genre>());
         String postedFilmString = mapper.writeValueAsString(validFilm);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
                 .content(postedFilmString));
-        Film validFilm1 = new Film("A1", "a11", LocalDate.of(1987, 3, 4), 90);
+        Film validFilm1 = new Film("A1", "a11", LocalDate.of(1987, 3, 4),
+                90, new Mpa(1, "G"), new ArrayList<Genre>());
         validFilm1.setId(1);
         String putedFilmString1 = mapper.writeValueAsString(validFilm1);
         mockMvc.perform(put("/films")
@@ -169,15 +176,14 @@ public class FilmControllerTest {
 
     @SneakyThrows
     @Test
-    void putToVoidIdFilmTest() {//Попробовал сделать тест на исключене через mockMvc, сам не понял, получилось или нет
-        Film inValidFilm = new Film("A1", "a11", LocalDate.of(1987, 3, 4), 90);
+    void putToVoidIdFilmTest() {
+        Film inValidFilm = new Film("A1", "a11", LocalDate.of(1987, 3, 4),
+                90, new Mpa(1, "G"), new ArrayList<Genre>());
         inValidFilm.setId(1);
         String putedFilmString1 = mapper.writeValueAsString(inValidFilm);
         try {
-            mockMvc.perform(put("/films")
-                    .contentType("application/json")
-                    .content(putedFilmString1)).andExpect(mvcResult -> mvcResult.getResolvedException().getClass().
-                    equals(IllegalArgumentException.class));
+            mockMvc.perform(put("/films").contentType("application/json").content(putedFilmString1))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(IllegalArgumentException.class));
             log.info("films Map: ", controller.getAllFilms());
         } finally {
             return;
@@ -185,27 +191,29 @@ public class FilmControllerTest {
     }
 
     @Test
-    public void ThrowException() {//тестирование исключения без mockMvc
-        Film inValidFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4), 90);
-        NoIdException ex = Assertions.assertThrows(
-                NoIdException.class, () -> controller.putFilm(inValidFilm));
+    void throwException() {
+        Film inValidFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4),
+                90, new Mpa(1, "G"), new ArrayList<Genre>());
+        NoFoundException ex = Assertions.assertThrows(NoFoundException.class, () -> controller.put(inValidFilm));
         assertEquals("Wrong film Id", ex.getMessage());
     }
 
     @SneakyThrows
     @Test
     void addLikeTest() {
-        Film validFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4), 90);
+        Film validFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4),
+                90, new Mpa(1, "G"), new ArrayList<Genre>());
         String postedFilmString = mapper.writeValueAsString(validFilm);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
                 .content(postedFilmString));
-        Film validFilm1 = new Film("A1", "a11", LocalDate.of(1987, 3, 4), 90);
+        Film validFilm1 = new Film("A1", "a11", LocalDate.of(1987, 3, 4),
+                90, new Mpa(1, "G"), new ArrayList<Genre>());
         String putedFilmString1 = mapper.writeValueAsString(validFilm1);
         mockMvc.perform(post("/films")
                 .contentType("application/json")
                 .content(putedFilmString1));
-        assertEquals(2, storage.findPopular().size());
+        assertEquals(1, service.getPopular(1).size());
         User validUser = new User("seregako@mail.ru", "a1", "a", LocalDate.of(1987, 3, 4));
         String validUserString = mapper.writeValueAsString(validUser);
         mockMvc.perform(post("/users")
@@ -213,7 +221,7 @@ public class FilmControllerTest {
                 .content(validUserString));
         validUser.setId(1);
         mockMvc.perform(put("/films/1/like/1").contentType("application/json"));
-        assertEquals(service.getById(1).getRate(), 1);
+        assertEquals(service.getById(1).getRating(), 1);
         mockMvc.perform(delete("/films/1/like/1").contentType("application/json"));
         assertEquals(service.getById(1).getRate(), 0);
     }
