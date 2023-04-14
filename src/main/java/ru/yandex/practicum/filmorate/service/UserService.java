@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NoIdException;
+import ru.yandex.practicum.filmorate.exceptions.NoFoundException;
 import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.strorage.interfaces.FriendsStorage;
@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    UserStorage userStorage;
-    FriendsStorage friendsStorage;
+    private final UserStorage userStorage;
+    private final FriendsStorage friendsStorage;
 
     public UserService(@Qualifier("userDBStorage") UserStorage userStorage, FriendsStorage friendsStorage) {
         this.userStorage = userStorage;
@@ -33,7 +33,7 @@ public class UserService {
     public User update(User user) {
         loginValidator(user);
         if (!userStorage.exist(user.getId())) {
-            throw new NoIdException("users id is wrong");
+            throw new NoFoundException("users id is wrong");
         }
         if (user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -42,27 +42,27 @@ public class UserService {
     }
 
     public User getById(int userId) {
-        return userStorage.findById(userId).orElseThrow(() -> new NoIdException("Wrong user Id"));
+        return userStorage.findById(userId).orElseThrow(() -> new NoFoundException("Wrong user Id"));
     }
 
 
     public void addFriend(int userId, int friendId) {
         if (!(userStorage.exist(userId) && userStorage.exist(friendId))) {
-            throw new NoIdException("Wrong user Id");
+            throw new NoFoundException("Wrong user Id");
         }
         friendsStorage.addFriend(userId, friendId);
     }
 
     public void removeFromFriends(int userId, int friendId) {
         if (!(userStorage.exist(userId) && userStorage.exist(friendId))) {
-            throw new NoIdException("Wrong user Id");
+            throw new NoFoundException("Wrong user Id");
         }
         friendsStorage.removeFriend(userId, friendId);
     }
 
     public List<User> getFriendsList(int userId) {
         if (!userStorage.exist(userId)) {
-            throw new NoIdException("users id is wrong");
+            throw new NoFoundException("users id is wrong");
         }
         List<User> friends = new ArrayList<>();
         if (friendsStorage.findFriends(userId).size() > 0) {
@@ -75,7 +75,7 @@ public class UserService {
 
     public List<User> getCommonFriends(int userId, int friendId) {
         if (!userStorage.exist(userId) && !userStorage.exist(friendId)) {
-            throw new NoIdException("users or friends id is wrong");
+            throw new NoFoundException("users or friends id is wrong");
         }
         List<User> usersFriends = getFriendsList(userId);
         List<User> friendsFriends = getFriendsList(friendId);

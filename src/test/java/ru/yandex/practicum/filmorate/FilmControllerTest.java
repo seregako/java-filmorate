@@ -17,18 +17,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exceptions.NoIdException;
+import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
+import ru.yandex.practicum.filmorate.exceptions.NoFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.strorage.LikesdBStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,12 +54,17 @@ public class FilmControllerTest {
 
     @Autowired
     FilmService service;
+
+    @Autowired
+    LikesdBStorage likesStorage;
+
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
         service.clearStorage();
+        likesStorage.clearStorage();
         log.info("Список фильмлов перед тестом: " + service.getAll());
     }
 
@@ -127,8 +133,8 @@ public class FilmControllerTest {
         Film invalidFilm = new Film("A", "a", LocalDate.of(1895, 12, 27),
                 90, new Mpa(1, "G"), new ArrayList<Genre>());
         String invalidFilmString = mapper.writeValueAsString(invalidFilm);
-        IllegalArgumentException ex = Assertions.assertThrows(
-                IllegalArgumentException.class, () -> controller.put(invalidFilm));
+        BadRequestException ex = Assertions.assertThrows(
+                BadRequestException.class, () -> controller.put(invalidFilm));
         assertEquals("Слишком ранняя дата", ex.getMessage());
     }
 
@@ -188,7 +194,7 @@ public class FilmControllerTest {
     void throwException() {
         Film inValidFilm = new Film("A", "a1", LocalDate.of(1987, 3, 4),
                 90, new Mpa(1, "G"), new ArrayList<Genre>());
-        NoIdException ex = Assertions.assertThrows(NoIdException.class, () -> controller.put(inValidFilm));
+        NoFoundException ex = Assertions.assertThrows(NoFoundException.class, () -> controller.put(inValidFilm));
         assertEquals("Wrong film Id", ex.getMessage());
     }
 

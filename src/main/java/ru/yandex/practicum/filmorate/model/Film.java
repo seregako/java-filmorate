@@ -31,8 +31,7 @@ public class Film {
 
     @Positive
     private int duration;
-   // private Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
-    private List<Genre> genres;
+    private List<Genre> genres = new ArrayList<>();
     private Mpa mpa;
     private int rating;
 
@@ -51,7 +50,7 @@ public class Film {
     public Film() {
     }
 
-   public Integer getRate() {
+    public Integer getRate() {
         return likes.size();
-   }
+    }
 }

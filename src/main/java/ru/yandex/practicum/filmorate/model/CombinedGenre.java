@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CombinedGenre {
-    int FilmId;
-    int genreId;
-    String genreName;
+   private int filmId;
+   private int genreId;
+   private String genreName;
 }

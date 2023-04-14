@@ -4,9 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NoIdException;
+import ru.yandex.practicum.filmorate.exceptions.NoFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+
 import javax.validation.Valid;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class UserController {
     }
 
     @PutMapping()
-    public User put(@RequestBody User user) throws NoIdException {
+    public User put(@RequestBody User user) throws NoFoundException {
         User userFromStorage = userService.update(user);
         log.info("Map after PUT: {}", userService.getAll());
         return userFromStorage;

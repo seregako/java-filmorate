@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NoFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.strorage.interfaces.MpaStorage;
 
@@ -19,6 +20,6 @@ public class MpaService {
     }
 
     public Mpa getById(int mpaId) {
-        return storage.findById(mpaId);
+        return storage.findById(mpaId).orElseThrow(() -> new NoFoundException("no mpa with id " + mpaId));
     }
 }

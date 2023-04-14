@@ -4,18 +4,19 @@ import lombok.Data;
 
 @Data
 public class Mpa {
-    int id;
-    String name;
+    private int id;
+    private String name;
 
     public Mpa(int id, String name) {
         this.id = id;
         this.name = name;
     }
 
+    public Mpa() {
+    }
+
     public Mpa(int id) {
         this.id = id;
     }
 
-    public Mpa() {
-    }
 }

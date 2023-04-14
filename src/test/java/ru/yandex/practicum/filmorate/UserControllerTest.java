@@ -20,6 +20,7 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.strorage.FriendsDBStorage;
 import ru.yandex.practicum.filmorate.strorage.UserDBStorage;
 
 import java.time.LocalDate;
@@ -51,6 +52,10 @@ public class UserControllerTest {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    FriendsDBStorage friendsStorage;
+
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -61,11 +66,11 @@ public class UserControllerTest {
     @AfterEach
     public void clear() {
         userStorage.deleteAll();
+        friendsStorage.deleteAll();
     }
 
     @Test
     void addValidUserTest() throws Exception {
-       // userStorage.deleteAll();
         User validUser = new User("seregako@mail.ru", "a1", "a", LocalDate.of(1987, 3, 4));
         String validUserString = mapper.writeValueAsString(validUser);
         mockMvc.perform(post("/users")
@@ -79,7 +84,6 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     void addInvalidEmailUserTest() {
-       // userStorage.deleteAll();
         User inValidEmailUser = new User("seregako-mail.ru", "a1", "a", LocalDate.of(1987, 3, 4));
         String inValidUserString = mapper.writeValueAsString(inValidEmailUser);
         System.out.println("body of inValid user: " + inValidUserString);
@@ -94,7 +98,6 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     void addEmptyNameUserTest() {
-       // userStorage.deleteAll();
         User emptyNameUser = new User("seregako@mail.ru", "a1", "", LocalDate.of(1987, 3, 4));
         String inValidUserString = mapper.writeValueAsString(emptyNameUser);
         System.out.println("body of empty name user: " + emptyNameUser);
@@ -111,7 +114,6 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     void putUserTest() {
-       // userStorage.deleteAll();
         User validUser = new User("seregako@mail.ru", "postedUser", "a", LocalDate.of(1987, 3, 4));
         String validUserString = mapper.writeValueAsString(validUser);
         User validUser1 = new User("seregako@mail.ru", "puttedUser", "b", LocalDate.of(1987, 3, 4));
@@ -131,7 +133,6 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     void addFriendTest() {
-       // userStorage.deleteAll();
         User validUser = new User("seregako@mail.ru", "1", "a", LocalDate.of(1987, 3, 4));
         String validUserString = mapper.writeValueAsString(validUser);
         User validUser1 = new User("seregako@mail.ru", "2", "b", LocalDate.of(1987, 3, 4));
@@ -172,7 +173,6 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     void deleteFriendTest() {
-        //userStorage.deleteAll();
         User validUser = new User("seregako@mail.ru", "1", "a", LocalDate.of(1987, 3, 4));
         String validUserString = mapper.writeValueAsString(validUser);
         User validUser1 = new User("seregako@mail.ru", "2", "b", LocalDate.of(1987, 3, 4));
@@ -205,7 +205,6 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     void getCommonFriendsTest() {
-       // userStorage.deleteAll();
         User validUser = new User("seregako@mail.ru", "1", "a", LocalDate.of(1987, 3, 4));
         String validUserString = mapper.writeValueAsString(validUser);
         User validUser1 = new User("seregako@mail.ru", "2", "b", LocalDate.of(1987, 3, 4));

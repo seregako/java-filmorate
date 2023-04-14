@@ -6,10 +6,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
-import ru.yandex.practicum.filmorate.exceptions.NoIdException;
-import ru.yandex.practicum.filmorate.model.CombinedGenre;
+import ru.yandex.practicum.filmorate.exceptions.NoFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.strorage.interfaces.*;
 
 import java.sql.Date;
@@ -36,7 +35,7 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public Film find(int id) {
-        if (!exist(id)) throw new NoIdException("Wrong film id!");
+        if (!exist(id)) throw new NoFoundException("Wrong film id!");
         String query = "SELECT *, m.name AS mpa_name FROM film AS f LEFT JOIN mpa AS m ON f.mpa_id = m.mpa_id WHERE f.id = ?";
         Film film = jdbcTemplate.query(query, new Object[]{id}, new FilmMapper()).stream().findAny().get();
         film.setGenres(genreStorage.findByFilmId(id));
@@ -46,7 +45,7 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        if (!exist(film.getId())) throw new NoIdException("Wrong film Id");
+        if (!exist(film.getId())) throw new NoFoundException("Wrong film Id");
         log.info("Фильм для обновления" + film);
         genreStorage.removeByFilmId(film.getId());
         genreStorage.addGenres(film);
@@ -60,7 +59,7 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public void clearStorage() {
-        String query = "DELETE FROM film; DELETE FROM likes; DELETE FROM films_genres; ALTER TABLE film ALTER COLUMN id RESTART WITH 1 ";
+        String query = "DELETE FROM film; DELETE FROM films_genres; ALTER TABLE film ALTER COLUMN id RESTART WITH 1 ";
         jdbcTemplate.execute(query);
     }
 
@@ -68,26 +67,6 @@ public class FilmDBStorage implements FilmStorage {
     public List<Film> findAll() {
         String query = "SELECT  *, m.name as mpa_name FROM film as f LEFT JOIN mpa as m WHERE f.mpa_id = m.mpa_id";
         List<Film> films = jdbcTemplate.query(query, new FilmMapper());
-        List <CombinedGenre> allFilmsGenres = genreStorage.allTable();
-        Set <Integer> filmsIds = new LinkedHashSet<>();
-        for (Film film:films){
-            filmsIds.add(film.getId());
-        }
-        Map <Integer, List <Genre>>  genresByFilms = new HashMap<>();
-        for (Integer filmId: filmsIds) {
-            List <Genre> genres = new ArrayList<>();
-            for (CombinedGenre cGenre: allFilmsGenres){
-                if (filmId.equals(cGenre.getFilmId())){genres.add(new Genre(cGenre.getGenreId(),cGenre.getGenreName()));}
-            }
-            genresByFilms.put(filmId, genres);
-        }
-
-        for (Film film : films) {
-            if (!genresByFilms.containsKey(film.getId())){
-            film.setGenres(genresByFilms.get(film.getId()));}
-            else {film.setGenres(new ArrayList<Genre>());}
-            film.setRating(likesStorage.getLikesById(film.getId()).size());
-        }
         return films;
     }
 
@@ -109,7 +88,7 @@ public class FilmDBStorage implements FilmStorage {
         film.setId(newId);
         genreStorage.addGenres(film);
         film.setGenres(genreStorage.findByFilmId(newId));
-        film.setMpa(mpaStorage.findById(film.getMpa().getId()));
+        film.setMpa(mpaStorage.findById(film.getMpa().getId()).orElse(new Mpa()));
         log.info("New Film Created: {}", film);
         return film;
     }
@@ -132,8 +111,8 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public void addLike(int filmId, int userId) {
-        if (!userStorage.exist(userId)) throw new NoIdException("addLike no user with id " + userId);
-        if (!exist(filmId)) throw new NoIdException("addLike: no film with id " + filmId);
+        if (!userStorage.exist(userId)) throw new NoFoundException("addLike no user with id " + userId);
+        if (!exist(filmId)) throw new NoFoundException("addLike: no film with id " + filmId);
         String query = "INSERT INTO likes (film_id, user_id) VALUES (?,?)";
         jdbcTemplate.update(query, filmId, userId);
     }

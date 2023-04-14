@@ -11,4 +11,6 @@ public interface FriendsStorage {
     void removeFriend(int userId, int friendId);
 
     List<Friendship> findFriends(int userId);
+
+    void deleteAll();
 }

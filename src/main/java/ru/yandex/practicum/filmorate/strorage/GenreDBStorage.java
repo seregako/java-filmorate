@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mapper.CombinedGenreMapper;
 import ru.yandex.practicum.filmorate.mapper.GenreMapper;
-import ru.yandex.practicum.filmorate.exceptions.NoIdException;
 import ru.yandex.practicum.filmorate.model.CombinedGenre;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -22,21 +21,20 @@ public class GenreDBStorage implements GenreStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Genre findById(int genreId) {
-            if (!genreExist(genreId)) throw new NoIdException("No genre with id " + genreId);
-            String sql = "SELECT * FROM genre WHERE genre_id = ?";
-            return jdbcTemplate.query(sql, new Object[]{genreId}, new GenreMapper()).stream().findAny().get();
-        }
+    public Optional<Genre> findById(int genreId) {
+        String sql = "SELECT * FROM genre WHERE genre_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{genreId}, new GenreMapper()).stream().findAny();
+    }
 
     @Override
     public void removeByFilmId(int filmId) {
-        String query = "DELETE FROM films_genres WHERE film_id = "+filmId;
+        String query = "DELETE FROM films_genres WHERE film_id = " + filmId;
         jdbcTemplate.execute(query);
     }
 
 
     @Override
-    public List <CombinedGenre> allTable() {
+    public List<CombinedGenre> allTable() {
         String query = "SELECT f.film_id, g.genre_id, g.name AS genre_name FROM films_genres AS f LEFT JOIN GENRE g " +
                 "on f.GENRE_ID = g.GENRE_ID";
         return jdbcTemplate.query(query, new CombinedGenreMapper());
@@ -60,6 +58,7 @@ public class GenreDBStorage implements GenreStorage {
     @Override
     public void addGenres(Film film) {
         List<Genre> genres = film.getGenres();
+        log.info("films genres: {}", genres);
         if (!genres.isEmpty()) {
             for (Genre genre : genres) {
                 writeGenreToTable(film.getId(), genre.getId());
@@ -70,12 +69,5 @@ public class GenreDBStorage implements GenreStorage {
     private void writeGenreToTable(int filmId, int genreId) {
         String query = "MERGE INTO films_genres (film_id, genre_id) VALUES (?, ?)";
         jdbcTemplate.update(query, filmId, genreId);
-    }
-
-    private boolean genreExist(int id) {
-        String query = "SELECT COUNT(*) FROM genre WHERE genre_id = ?";
-        Integer answer = jdbcTemplate.queryForObject(
-                query, Integer.class, id);
-        return !answer.equals(0);
     }
 }

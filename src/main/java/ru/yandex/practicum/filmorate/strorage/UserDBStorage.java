@@ -1,14 +1,12 @@
 package ru.yandex.practicum.filmorate.strorage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.strorage.interfaces.FriendsStorage;
 import ru.yandex.practicum.filmorate.strorage.interfaces.UserStorage;
 
 import java.sql.Date;
@@ -18,20 +16,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Repository
 public class UserDBStorage implements UserStorage {
-    private static final Logger log = LoggerFactory.getLogger(UserDBStorage.class);
     private final JdbcTemplate jdbcTemplate;
-    private final FriendsStorage friendsStorage;
 
-    public UserDBStorage(JdbcTemplate jdbcTemplate, FriendsStorage friendsStorage) {
+    public UserDBStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.friendsStorage = friendsStorage;
     }
 
     @Override
     public void deleteAll() {
-        String query = "DELETE FROM user_table; DELETE FROM friends;ALTER TABLE user_table ALTER COLUMN id RESTART WITH 1 ";
+        String query = "DELETE FROM user_table; ALTER TABLE user_table ALTER COLUMN id RESTART WITH 1 ";
         jdbcTemplate.execute(query);
         log.info("хранилище очищено");
     }

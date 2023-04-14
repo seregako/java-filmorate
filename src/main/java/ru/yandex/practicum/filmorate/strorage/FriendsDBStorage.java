@@ -33,4 +33,10 @@ public class FriendsDBStorage implements FriendsStorage {
         String query = "SELECT * FROM friends WHERE user_id =" + userId;
         return jdbcTemplate.query(query, new FriendshipMapper());
     }
+
+    @Override
+    public void deleteAll() {
+        String query = "DELETE FROM friends;";
+        jdbcTemplate.execute(query);
+    }
 }

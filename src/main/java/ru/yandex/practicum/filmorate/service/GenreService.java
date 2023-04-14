@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NoFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.strorage.interfaces.GenreStorage;
 
@@ -14,15 +15,11 @@ public class GenreService {
         this.storage = storage;
     }
 
-    public void deleteByFilmId(int filmId){
-        storage.removeByFilmId(filmId);
-    }
-
     public List<Genre> getAll() {
         return storage.findAll();
     }
 
     public Genre getById(int genreId) {
-        return storage.findById(genreId);
+        return storage.findById(genreId).orElseThrow(() -> new NoFoundException("no genre with id " + genreId));
     }
 }
