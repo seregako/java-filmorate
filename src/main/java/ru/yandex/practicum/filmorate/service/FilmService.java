@@ -37,6 +37,7 @@ public class FilmService {
 
     public Film getById(int filmId) {
         Film film = filmStorage.find(filmId);
+        //film.setGenres(genreStorage.findByFilmId(filmId));
         film.setGenres(genreStorage.findByFilmId(filmId));
         return film;
     }
@@ -75,7 +76,11 @@ public class FilmService {
     }
 
     public List<Film> getAll() {
+
+
+
         return filmStorage.findAll();
+
     }
 
     public void clearStorage() {

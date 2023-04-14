@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.strorage;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.FriendshipMapper;
+import ru.yandex.practicum.filmorate.mapper.FriendshipMapper;
 import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.strorage.interfaces.FriendsStorage;
 

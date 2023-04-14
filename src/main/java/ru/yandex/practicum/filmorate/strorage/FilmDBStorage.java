@@ -5,9 +5,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.FilmMapper;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.exceptions.NoIdException;
+import ru.yandex.practicum.filmorate.model.CombinedGenre;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.strorage.interfaces.*;
 
 import java.sql.Date;
@@ -45,9 +47,8 @@ public class FilmDBStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         if (!exist(film.getId())) throw new NoIdException("Wrong film Id");
-        String clearGenrequery = "DELETE FROM films_genres WHERE film_id =  " + film.getId();
-        jdbcTemplate.execute(clearGenrequery);
         log.info("Фильм для обновления" + film);
+        genreStorage.removeByFilmId(film.getId());
         genreStorage.addGenres(film);
         String query = "UPDATE film SET name = ?, description = ?, duration = ?," +
                 " release_date =?, mpa_id = ? where id = " + film.getId();
@@ -67,8 +68,24 @@ public class FilmDBStorage implements FilmStorage {
     public List<Film> findAll() {
         String query = "SELECT  *, m.name as mpa_name FROM film as f LEFT JOIN mpa as m WHERE f.mpa_id = m.mpa_id";
         List<Film> films = jdbcTemplate.query(query, new FilmMapper());
+        List <CombinedGenre> allFilmsGenres = genreStorage.allTable();
+        Set <Integer> filmsIds = new LinkedHashSet<>();
+        for (Film film:films){
+            filmsIds.add(film.getId());
+        }
+        Map <Integer, List <Genre>>  genresByFilms = new HashMap<>();
+        for (Integer filmId: filmsIds) {
+            List <Genre> genres = new ArrayList<>();
+            for (CombinedGenre cGenre: allFilmsGenres){
+                if (filmId.equals(cGenre.getFilmId())){genres.add(new Genre(cGenre.getGenreId(),cGenre.getGenreName()));}
+            }
+            genresByFilms.put(filmId, genres);
+        }
+
         for (Film film : films) {
-            film.setGenres(genreStorage.findByFilmId(film.getId()));
+            if (!genresByFilms.containsKey(film.getId())){
+            film.setGenres(genresByFilms.get(film.getId()));}
+            else {film.setGenres(new ArrayList<Genre>());}
             film.setRating(likesStorage.getLikesById(film.getId()).size());
         }
         return films;
@@ -111,7 +128,6 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public void setId(int id) {
-
     }
 
     @Override

@@ -16,8 +16,6 @@ import java.util.*;
 
 @Data
 public class Film {
-    @JsonIgnore
-    Set<Integer> likes = new HashSet();//Сет с уникальными айдишниками лайкнувших
     private int id;
 
     @NotBlank()
@@ -33,14 +31,15 @@ public class Film {
 
     @Positive
     private int duration;
-
-    Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
-
-    Mpa mpa;
-
+   // private Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
+    private List<Genre> genres;
+    private Mpa mpa;
     private int rating;
 
-    public Film(String name, String description, LocalDate releaseDate, int duration, Mpa mpa, Set<Genre> genres) {
+    @JsonIgnore
+    private Set<Integer> likes = new HashSet<>();//Сет с уникальными айдишниками лайкнувших
+
+    public Film(String name, String description, LocalDate releaseDate, int duration, Mpa mpa, List<Genre> genres) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

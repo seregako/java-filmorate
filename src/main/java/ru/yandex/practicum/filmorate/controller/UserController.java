@@ -40,9 +40,9 @@ public class UserController {
 
     @PutMapping()
     public User put(@RequestBody User user) throws NoIdException {
-        User userFromstorage = userService.update(user);
+        User userFromStorage = userService.update(user);
         log.info("Map after PUT: {}", userService.getAll());
-        return userFromstorage;
+        return userFromStorage;
     }
 
     @PutMapping("/{id}/friends/{friendId}")
@@ -56,7 +56,6 @@ public class UserController {
         userService.removeFromFriends(userId, friendId);
         log.info("Map after delete friend: {}", userService.getAll());
     }
-
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable("id") int userId) {
